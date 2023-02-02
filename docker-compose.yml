@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:13.3
+    env_file:
+      - .env
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DATABASE_DATABASE}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    ports:
+      - '5432:5432'
+    # networks:
+    #   - app-network
+    restart: unless-stopped
+
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: app
+  #   restart: unless-stopped
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - ignore:/usr/src/app/node_modules/
+  #   env_file: .env
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   ports:
+  #     - '3000:3000'
+  #   networks:
+  #     - app-network
+# volumes:
+#   ignore:
+
+# networks:
+#   app-network:
+#     driver: bridge
