@@ -1,14 +1,13 @@
-import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { Document } from './entities/document.entity'
 import { User } from './entities/user.entity'
 import { UserController } from './user.controller'
-import { TestProcessor } from './user.processor'
 import { UserService } from './user.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), BullModule.registerQueue({ name: 'test' })],
-  providers: [UserService, TestProcessor],
+  imports: [TypeOrmModule.forFeature([User, Document])],
+  providers: [UserService],
   controllers: [UserController],
   exports: [UserService],
 })

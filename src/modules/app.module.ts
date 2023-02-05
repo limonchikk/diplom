@@ -6,7 +6,6 @@ import { databaseOptionsFactory } from './database/options/factory'
 import { UserModule } from './user/user.module'
 import { APP_FILTER } from '@nestjs/core'
 import { ApplicationExceptionFilter } from './common/filters/application.filter'
-import { BullModule } from '@nestjs/bull'
 
 @Module({
   imports: [
@@ -17,12 +16,6 @@ import { BullModule } from '@nestjs/bull'
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => databaseOptionsFactory(config),
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
     }),
     UserModule,
   ],

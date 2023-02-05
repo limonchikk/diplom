@@ -1,17 +1,21 @@
-import { InjectQueue } from '@nestjs/bull'
-import { Controller, Get } from '@nestjs/common'
+import { Body, Controller, Post, UploadedFiles } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { Queue } from 'bull'
+import { ApiFile } from '../common/decorators/api-file'
+import { CreateUserDto, UserDocumentsDto } from './dto/create-user.dto'
+import { Document } from './entities/document.entity'
 
 @Controller('user')
 @ApiTags('Пользователь')
 export class UserController {
-  constructor(@InjectQueue('test') private queue: Queue) {}
+  constructor() {}
 
-  @Get()
-  test() {
+  @Post()
+  @ApiFile(['passportOriginal', 'russianPassort'])
+  create(@UploadedFiles() files: Express.Multer.File[], @Body() dto: UserDocumentsDto) {
+    // const d = new Document()
+    console.log(files)
+    // console.log(dto)
     // console.log(this.queue)
-    this.queue.add('one', { data: 'anydata' })
     return '123'
   }
 }
