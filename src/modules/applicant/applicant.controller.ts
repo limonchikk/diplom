@@ -3,7 +3,6 @@ import { ApiTags } from '@nestjs/swagger'
 import { ApiFile } from '../common/decorators/api-file'
 import { ApplicantService } from './applicant.service'
 import { CreateApplicantDto, ApplicantDocumentsDto } from './dto/create-applicant.dto'
-import { Document } from '../document/entities/document.entity'
 
 @Controller('applicant')
 @ApiTags('Пользователь')
@@ -11,8 +10,11 @@ export class ApplicantController {
   constructor(private readonly applicantService: ApplicantService) {}
 
   @Post()
-  @ApiFile(['passportOriginal', 'russianPassort', 'educationDocumentOriginal', 'russianEducationDocument'])
-  create(@UploadedFiles() files: Express.Multer.File[], @Body() dto: CreateApplicantDto) {
-    return this.applicantService.save(dto, files)
+  @ApiFile(Object.keys(new ApplicantDocumentsDto()))
+  create(@UploadedFiles() files: Record<string, Express.Multer.File[]>, @Body() dto: CreateApplicantDto) {
+    return this.applicantService.save(
+      dto,
+      Object.values(files).map((v) => v[0]),
+    )
   }
 }

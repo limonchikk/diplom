@@ -10,12 +10,11 @@ export class Document {
   })
   readonly id!: string
 
-  @Column('uuid', {
-    name: 'document_id',
-    comment: "Document's identifier",
-    unique: true,
+  @Column({
+    name: 'base64',
+    comment: "Document's b64 value",
   })
-  documentId!: string
+  base64!: string
 
   @Column({
     type: 'enum',

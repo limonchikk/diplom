@@ -36,7 +36,7 @@ export class Applicant {
     comment: "Applicant's phone number with WatsApp",
     unique: true,
   })
-  phoneNumber: number
+  phoneNumber: string
 
   @Column({
     type: 'enum',
@@ -69,19 +69,6 @@ export class Applicant {
   })
   preferredDirectionOfStudy: PreferredDirectionOfStudy
 
-  @OneToMany(() => Document, (doc) => doc.applicant)
+  @OneToMany(() => Document, (doc) => doc.applicant, { cascade: ['insert', 'remove'] })
   documents: Document[]
-
-  // constructor(props: Omit<Applicant, 'id'>) {
-  //   this.name = props.name
-  //   this.surname = props.surname
-  //   this.email = props.email
-  //   this.phoneNumber = props.phoneNumber
-  //   this.sex = props.sex
-  //   this.country = props.country
-  //   this.birthDate = props.birthDate
-  //   this.residenceVisaAvalibility = props.residenceVisaAvalibility
-  //   this.preferredDirectionOfStudy = props.preferredDirectionOfStudy
-  //   this.documents = props.documents
-  // }
 }

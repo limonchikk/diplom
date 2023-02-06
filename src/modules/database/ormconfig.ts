@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as dotenv from 'dotenv'
 import migrations from './migrations'
 import { Applicant } from '../applicant/entities/applicant.entity'
+import { Document } from '../document/entities/document.entity'
 
 function strict(name: string): string | undefined {
   if (!process.env[name]) {
@@ -24,12 +25,12 @@ dotenv.config({ path: ENV_FILE })
 export default new DataSource({
   type: strict('DATABASE_TYPE') as any,
   host: strict('DATABASE_HOST'),
-  username: strict('DATABASE_USERNAME'),
+  username: strict('DATABASE_USER'),
   password: strict('DATABASE_PASSWORD'),
   database: strict('DATABASE_DATABASE'),
   port: +strict('DATABASE_PORT')!,
   synchronize: false,
-  entities: [Applicant],
+  entities: [Applicant, Document],
   migrations,
   migrationsRun: true,
   migrationsTableName: process.env.DATABASE_MIGRATIONS_TABLE_NAME,

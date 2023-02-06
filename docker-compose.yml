@@ -8,7 +8,7 @@ services:
       - ./volumes/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DATABASE_DATABASE}
-      - POSTGRES_APPLICANT=${DATABASE_APPLICANTNAME}
+      - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     ports:
       - '5432:5432'
@@ -16,15 +16,15 @@ services:
     #   - app-network
     restart: unless-stopped
 
-  redis:
-    image: redis:6.2-alpine
-    restart: always
-    ports:
-      - '6379:6379'
-    # networks:
-    #   - app-network
-    volumes:
-      - ./volumes/redis:/data/redis
+  # redis:
+  #   image: redis:6.2-alpine
+  #   restart: always
+  #   ports:
+  #     - '6379:6379'
+  #   # networks:
+  #   #   - app-network
+  #   volumes:
+  #     - ./volumes/redis:/data/redis
 
   # app:
   #   build:

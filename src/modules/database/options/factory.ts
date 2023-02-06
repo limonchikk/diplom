@@ -10,7 +10,7 @@ export const databaseOptionsFactory = (config: ConfigService): TypeOrmModuleOpti
   username: config.get<string>('database.username'),
   password: config.get<string>('database.password'),
   database: config.get<string>('database.database'),
-  logging: config.get<string>('database.logging') === 'true',
+  logging: false,
   synchronize: false,
   migrationsRun: false,
   migrationsTableName: config.get<string>('database.migrationsTableName'),

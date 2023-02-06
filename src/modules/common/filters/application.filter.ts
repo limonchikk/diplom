@@ -22,8 +22,6 @@ export class ApplicationExceptionFilter implements ExceptionFilter {
       return response.status(HttpStatus.SERVICE_UNAVAILABLE).send({ dateTime: new Date().toISOString(), errors: [{ message: exception.message }] })
     }
 
-    console.error(JSON.stringify(exception))
-
     return response.status(HttpStatus.SERVICE_UNAVAILABLE).send({ dateTime: new Date().toISOString(), errors: [{ message: 'Неизвестная ошибка' }] })
   }
 

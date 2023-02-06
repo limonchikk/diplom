@@ -9,10 +9,10 @@ export enum ApplicantSex {
 }
 
 export enum ApplicantDocumentType {
-  PassportOriginal = 'passport_original',
-  RussianPassport = 'russian_passport',
-  EducationDocumentOriginal = 'education_document_original',
-  RussianEducationDocument = 'russian_education_document',
+  passportOriginal = 'passport_original',
+  russianPassport = 'russian_passport',
+  educationDocumentOriginal = 'education_document_original',
+  russianEducationDocument = 'russian_education_document',
 }
 
 export type ApplicantDocuments = {
