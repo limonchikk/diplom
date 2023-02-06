@@ -2,7 +2,6 @@ import migrations from '../migrations'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 import { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { ConfigService } from '@nestjs/config'
-import { User } from '../../user/entities/user.entity'
 
 export const databaseOptionsFactory = (config: ConfigService): TypeOrmModuleOptions & PostgresConnectionOptions => ({
   type: config.get<any>('database.type'),

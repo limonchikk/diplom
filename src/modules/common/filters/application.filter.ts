@@ -9,6 +9,8 @@ export class ApplicationExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
 
+    console.log(exception)
+
     /* HTTP validation exception */
     if (ApplicationExceptionFilter.assertValidationException(exception)) {
       const exceptionDto = this.convertValidationErrorToDTO(exception as any)

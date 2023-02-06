@@ -1,57 +1,63 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { PreferredDirectionOfStudy, UserSex } from '../user.types'
-import { Document } from './document.entity'
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { PreferredDirectionOfStudy, ApplicantSex } from '../applicant.types'
+import { Document } from '../../document/entities/document.entity'
 
-@Entity({ name: 'users' })
-export class User {
+@Entity({ name: 'applicants' })
+export class Applicant {
   @PrimaryGeneratedColumn('uuid', {
-    name: 'user_id',
-    comment: "User's unique identifier",
+    name: 'applicant_id',
+    comment: "Applicant's unique identifier",
   })
-  readonly userId!: string
+  readonly applicantId!: string
+
+  @CreateDateColumn({
+    comment: 'Created at date',
+    name: 'updated_at',
+  })
+  createdAt: Date
 
   @Column({
-    comment: "User's name",
+    comment: "Applicant's name",
   })
   name: string
 
   @Column({
-    comment: "User's surname",
+    comment: "Applicant's surname",
   })
   surname: string
 
   @Column({
-    comment: "User's email",
+    comment: "Applicant's email",
     unique: true,
   })
   email: string
 
   @Column({
-    comment: "User's phone number with WatsApp",
+    comment: "Applicant's phone number with WatsApp",
     unique: true,
   })
   phoneNumber: number
 
   @Column({
     type: 'enum',
-    enum: UserSex,
-    comment: "User's sex",
+    enum: ApplicantSex,
+    comment: "Applicant's sex",
   })
-  sex: UserSex
+  sex: ApplicantSex
 
   @Column({
-    comment: "User's country",
+    comment: "Applicant's country",
   })
   country: string
 
   @Column('date', {
     name: 'birth_date',
-    comment: "User's birth date YYYY-MM-DD",
+    comment: "Applicant's birth date YYYY-MM-DD",
   })
   birthDate: Date
 
   @Column({
-    comment: 'User has residence visa',
+    comment: 'Applicant has residence visa',
   })
   residenceVisaAvalibility: boolean
 
@@ -59,14 +65,14 @@ export class User {
     name: 'direction_of_study',
     type: 'enum',
     enum: PreferredDirectionOfStudy,
-    comment: "User's preferred direction of study",
+    comment: "Applicant's preferred direction of study",
   })
   preferredDirectionOfStudy: PreferredDirectionOfStudy
 
-  @OneToMany(() => Document, (doc) => doc.user)
+  @OneToMany(() => Document, (doc) => doc.applicant)
   documents: Document[]
 
-  // constructor(props: Omit<User, 'id'>) {
+  // constructor(props: Omit<Applicant, 'id'>) {
   //   this.name = props.name
   //   this.surname = props.surname
   //   this.email = props.email

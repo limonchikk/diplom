@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { UserDocumentType } from '../user.types'
-import { User } from './user.entity'
+import { ApplicantDocumentType } from '../../applicant/applicant.types'
+import { Applicant } from '../../applicant/entities/applicant.entity'
 
 @Entity({ name: 'documents' })
 export class Document {
@@ -10,19 +10,20 @@ export class Document {
   })
   readonly id!: string
 
-  @PrimaryGeneratedColumn({
+  @Column('uuid', {
     name: 'document_id',
     comment: "Document's identifier",
+    unique: true,
   })
-  readonly documentId!: string
+  documentId!: string
 
   @Column({
     type: 'enum',
-    enum: UserDocumentType,
+    enum: ApplicantDocumentType,
     comment: 'Document type',
   })
-  readonly type!: UserDocumentType
+  type!: ApplicantDocumentType
 
-  @ManyToOne(() => User, (user) => user.documents)
-  readonly user!: UserDocumentType
+  @ManyToOne(() => Applicant, (applicant) => applicant.documents)
+  readonly applicant!: ApplicantDocumentType
 }
