@@ -16,7 +16,7 @@ export class ApplicationService implements OnModuleInit {
   constructor(@InjectRepository(Application) private applicantRepository: Repository<Application>, private readonly appConfig: ConfigService) {}
 
   async onModuleInit() {
-    const folderName = this.appConfig.get('document.folder') as string
+    const folderName = this.appConfig.get('files.folder') as string
     try {
       await fs.mkdir(folderName, { recursive: true })
     } catch (err) {
