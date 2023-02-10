@@ -1,3 +1,4 @@
-import { AddApplicantAndDocument1675724910343 } from './1675724910343-AddApplicantAndDocument'
+import { AddApplicationAndDocument1676049351147 } from './1676049351147-AddApplicationAndDocument'
+import { DropUniqueConstraintOnEmailAndPhone1676050221197 } from './1676050221197-DropUniqueConstraintOnEmailAndPhone'
 
-export default [AddApplicantAndDocument1675724910343]
+export default [AddApplicationAndDocument1676049351147, DropUniqueConstraintOnEmailAndPhone1676050221197]

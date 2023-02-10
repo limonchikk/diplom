@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { ApplicantDocumentType } from '../../applicant/applicant.types'
-import { Applicant } from '../../applicant/entities/applicant.entity'
+import { ApplicantDocumentType } from '../application.types'
+import { Application } from './application.entity'
 
 @Entity({ name: 'documents' })
 export class Document {
@@ -10,11 +10,12 @@ export class Document {
   })
   readonly id!: string
 
-  @Column({
-    name: 'base64',
-    comment: "Document's b64 value",
+  @Column('uuid', {
+    name: 'document_id',
+    comment: "Document's unique identifier",
+    unique: true,
   })
-  base64!: string
+  documentId!: string
 
   @Column({
     type: 'enum',
@@ -23,6 +24,6 @@ export class Document {
   })
   type!: ApplicantDocumentType
 
-  @ManyToOne(() => Applicant, (applicant) => applicant.documents)
-  readonly applicant!: ApplicantDocumentType
+  @ManyToOne(() => Application, (applicant) => applicant.documents)
+  application!: Application
 }

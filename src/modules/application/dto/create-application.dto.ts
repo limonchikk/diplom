@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
-import { IsBoolean, IsDateString, IsEmail, IsEnum, IsNumber, IsNumberString, IsString, MaxLength, MinLength } from 'class-validator'
-import { PreferredDirectionOfStudy, ApplicantSex } from '../applicant.types'
+import { Transform, Type } from 'class-transformer'
+import { IsBoolean, IsDateString, IsEmail, IsEnum, IsNumberString, IsString, MaxLength, MinLength } from 'class-validator'
+import { ApplicantSex, PreferredDirectionOfStudy } from '../application.types'
 
-export class ApplicantDocumentsDto {
+export class ApplicationDocumentsDto {
   @ApiProperty({
     description: 'Оригинал паспорта',
     type: 'file',
@@ -49,11 +49,15 @@ export class ApplicantDocumentsDto {
   russianEducationDocument!: Express.Multer.File
 }
 
-export class CreateApplicantDto extends ApplicantDocumentsDto {
+export class CreateApplicationDto extends ApplicationDocumentsDto {
   @ApiProperty({
     description: 'Имя абитуриента',
     type: String,
     required: true,
+  })
+  @Transform(({ value }) => {
+    if (value && !isNaN(+value)) return false
+    return value
   })
   @IsString({ message: 'Имя абитуриента должно быть строкой' })
   name!: string
@@ -62,6 +66,10 @@ export class CreateApplicantDto extends ApplicantDocumentsDto {
     description: 'Фамилия абитуриента',
     type: String,
     required: true,
+  })
+  @Transform(({ value }) => {
+    if (value && !isNaN(+value)) return false
+    return value
   })
   @IsString({ message: 'Фамилия абитуриента должна быть строкой' })
   surname!: string
@@ -97,6 +105,10 @@ export class CreateApplicantDto extends ApplicantDocumentsDto {
     description: 'Страна проживания абитуриента',
     type: String,
     required: true,
+  })
+  @Transform(({ value }) => {
+    if (value && !isNaN(+value)) return false
+    return value
   })
   @IsString({ message: 'Страна проживания абитуриента должна быть строкой' })
   country!: string

@@ -17,7 +17,7 @@ export default (): Record<string, any> => ({
     migrationsRun: process.env.DATABASE_MIGRATIONS_RUN,
     migrationsTableName: process.env.DATABASE_MIGRATIONS_TABLE_NAME,
   },
-  document: {
+  files: {
     folder: process.env.DOCUMENTS_FOLDER || 'files',
   },
 })

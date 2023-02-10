@@ -15,12 +15,9 @@ export enum ApplicantDocumentType {
   russianEducationDocument = 'russian_education_document',
 }
 
-export type ApplicantDocuments = {
-  folderName: string
-  files: {
-    buffer: Buffer
-    name: string
-    originalName: string
-    fieldName: string
-  }[]
+export type ApplicationDocument = {
+  buffer: Buffer
+  name: string
+  originalName: string
+  fieldName: string
 }
