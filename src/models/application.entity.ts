@@ -1,7 +1,16 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { Auditable } from '../../common/entities/auditable.entity'
-import { ApplicantSex, PreferredDirectionOfStudy } from '../application.types'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Auditable } from '../common/entities/auditable.entity'
 import { Document } from './document.entity'
+
+export enum PreferredDirectionOfStudy {
+  Technical = 'technical',
+  Medical = 'medical',
+}
+
+export enum ApplicantSex {
+  Male = 'male',
+  Female = 'female',
+}
 
 @Entity({ name: 'applications' })
 export class Application extends Auditable {
@@ -68,6 +77,12 @@ export class Application extends Auditable {
     comment: "Applicant's preferred direction of study",
   })
   applicantPreferredDirectionOfStudy: PreferredDirectionOfStudy
+
+  @Column({
+    comment: 'Application is viewed by admin user',
+    default: false,
+  })
+  viewed: boolean
 
   @OneToMany(() => Document, (doc) => doc.application, { cascade: ['insert', 'remove'] })
   documents: Document[]

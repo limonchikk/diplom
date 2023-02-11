@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform, Type } from 'class-transformer'
 import { IsBoolean, IsDateString, IsEmail, IsEnum, IsNumberString, IsString, MaxLength, MinLength } from 'class-validator'
-import { ApplicantSex, PreferredDirectionOfStudy } from '../application.types'
+import { ApplicantSex, PreferredDirectionOfStudy } from '../../models/application.entity'
 
 export class ApplicationDocumentsDto {
   @ApiProperty({

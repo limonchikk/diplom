@@ -1,6 +1,12 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { ApplicantDocumentType } from '../application.types'
 import { Application } from './application.entity'
+
+export enum ApplicantDocumentType {
+  passportOriginal = 'passport_original',
+  russianPassport = 'russian_passport',
+  educationDocumentOriginal = 'education_document_original',
+  russianEducationDocument = 'russian_education_document',
+}
 
 @Entity({ name: 'documents' })
 export class Document {
@@ -14,6 +20,7 @@ export class Document {
     name: 'document_id',
     comment: "Document's unique identifier",
     unique: true,
+    nullable: false,
   })
   documentId!: string
 
@@ -21,6 +28,7 @@ export class Document {
     type: 'enum',
     enum: ApplicantDocumentType,
     comment: 'Document type',
+    nullable: false,
   })
   type!: ApplicantDocumentType
 

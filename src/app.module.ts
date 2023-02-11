@@ -6,6 +6,8 @@ import { databaseOptionsFactory } from './database/options/factory'
 import { ApplicationModule } from './application/application.module'
 import { APP_FILTER } from '@nestjs/core'
 import { ApplicationExceptionFilter } from './common/filters/application.filter'
+import { UserModule } from './user/user.module'
+import { NotificationModule } from './notification/notification.module'
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ApplicationExceptionFilter } from './common/filters/application.filter'
       useFactory: (config: ConfigService) => databaseOptionsFactory(config),
     }),
     ApplicationModule,
+    UserModule,
+    NotificationModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ApplicationExceptionFilter }],
 })

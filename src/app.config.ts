@@ -17,6 +17,15 @@ export default (): Record<string, any> => ({
     migrationsRun: process.env.DATABASE_MIGRATIONS_RUN,
     migrationsTableName: process.env.DATABASE_MIGRATIONS_TABLE_NAME,
   },
+  user: {
+    defaultLogin: process.env.DEFAULT_USER_LOGIN,
+    defaultPassword: process.env.DEFAULT_USER_PASSWORD,
+  },
+  mailer: {
+    host: process.env.MAILER_HOST,
+    user: process.env.MAILER_USER,
+    password: process.env.MAILER_PASSWORD,
+  },
   files: {
     folder: process.env.DOCUMENTS_FOLDER || 'files',
   },

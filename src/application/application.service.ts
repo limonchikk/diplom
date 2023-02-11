@@ -2,14 +2,14 @@ import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CreateApplicationDto } from './dto/create-application.dto'
-import { Application } from './entities/application.entity'
-import { Document } from './entities/document.entity'
-import { ApplicantDocumentType } from './application.types'
+import { Application } from '../models'
 import fs from 'fs/promises'
 import path from 'path'
 import { ConfigService } from '@nestjs/config'
 import { v4 as uuidv4 } from 'uuid'
 import { CreateApplicationResponseDto } from './dto/create-application.response.dto'
+import { Document } from '../models'
+import { ApplicantDocumentType } from '../models/document.entity'
 
 @Injectable()
 export class ApplicationService implements OnModuleInit {
@@ -37,39 +37,31 @@ export class ApplicationService implements OnModuleInit {
     application.applicantPreferredDirectionOfStudy = dto.preferredDirectionOfStudy
     application.documents = []
 
-    const savedFilesIds: string[] = []
-
     try {
-      const documents = await Promise.all(
+      await Promise.all(
         files.map(async (f) => {
           const documentId = uuidv4()
 
           await fs.writeFile(path.join(this.appConfig.get('files.folder')!, documentId), f.buffer)
-          return { fieldName: f.fieldname, id: documentId }
+
+          const documentEntity = new Document()
+          documentEntity.documentId = documentId
+          documentEntity.type = ApplicantDocumentType[f.fieldname as keyof typeof ApplicantDocumentType]
+          application.documents.push(documentEntity)
         }),
       )
 
-      savedFilesIds.push(...documents.map((d) => d.id))
-
-      documents.forEach((doc) => {
-        const documentEntity = new Document()
-        documentEntity.documentId = doc.id
-        documentEntity.type = ApplicantDocumentType[doc.fieldName as keyof typeof ApplicantDocumentType]
-
-        application.documents.push(documentEntity)
-      })
-
-      await this.applicantRepository.save(application)
+      const data = await this.applicantRepository.save(application)
+      return new CreateApplicationResponseDto({ id: data.applicationId })
     } catch (err) {
+      console.log(err)
       await Promise.all(
-        savedFilesIds.map((di) => {
-          return fs.rm(path.join(this.appConfig.get('files.folder')!, di))
+        application.documents.map((di) => {
+          return fs.rm(path.join(this.appConfig.get('files.folder')!, di.documentId))
         }),
       )
 
       throw new BadRequestException('Произошла неизвестная ошибка при оформлении заявки')
     }
-
-    return new CreateApplicationResponseDto({ created: true })
   }
 }
