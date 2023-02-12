@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 import { NotificationService } from './notification.service'
 import { UserModule } from '../user/user.module'
+import { NotificationController } from './notification.controller'
 
 @Module({
   providers: [NotificationService],
@@ -36,5 +37,6 @@ import { UserModule } from '../user/user.module'
     }),
     UserModule,
   ],
+  controllers: [NotificationController],
 })
 export class NotificationModule {}

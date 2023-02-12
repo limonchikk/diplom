@@ -1,9 +1,7 @@
 import { applyDecorators, UnprocessableEntityException, UseInterceptors } from '@nestjs/common'
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes } from '@nestjs/swagger'
 import { Request } from 'express'
-import { diskStorage } from 'multer'
-import { extname } from 'path'
 
 export const ApiFile = (fileNames: string[]): MethodDecorator =>
   applyDecorators(

@@ -1,6 +1,5 @@
-import { Body, Controller, HttpStatus, Post, UploadedFiles } from '@nestjs/common'
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { ApiFile } from '../common/decorators/api-file'
 import { CreateQuestionDto } from './dto/create-question.dto'
 import { NotificationService } from './notification.service'
 
@@ -10,7 +9,7 @@ export class NotificationController {
   constructor(private readonly applicationService: NotificationService) {}
 
   @ApiOperation({
-    summary: 'Отправить письмо',
+    summary: 'Отправить электронное письмо',
   })
   @ApiResponse({
     status: HttpStatus.OK,

@@ -13,16 +13,19 @@ export class NotificationService {
   ) {}
 
   private sendEmail(data: ISendMailOptions) {
+    console.log(data)
     return this.mailerService.sendMail(data)
   }
 
   async sendQuestion(dto: CreateQuestionDto) {
     const toUser = await this.userService.getOne(this.configService.get('user.defaultLogin')!)
+    console.log(toUser)
+    console.log(dto)
 
     return this.sendEmail({
       template: 'new-application',
       context: dto,
-      subject: `Абитурент ${this.configService.get('app.serviceName')}! `,
+      subject: `Новый вопрос от абитуриента!`,
       to: toUser.email,
     })
   }

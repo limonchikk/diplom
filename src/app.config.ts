@@ -17,6 +17,11 @@ export default (): Record<string, any> => ({
     migrationsRun: process.env.DATABASE_MIGRATIONS_RUN,
     migrationsTableName: process.env.DATABASE_MIGRATIONS_TABLE_NAME,
   },
+  jwt: {
+    accessSecret: process.env.ACCESS_JWT_SECRET,
+    refreshSecret: process.env.REFRESH_JWT_SECRET,
+    accessExp: process.env.JWT_ACCESS_EXP,
+  },
   user: {
     defaultLogin: process.env.DEFAULT_USER_LOGIN,
     defaultPassword: process.env.DEFAULT_USER_PASSWORD,

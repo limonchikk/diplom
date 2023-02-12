@@ -3,6 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { User } from '../models'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { UpdateUserResponseDto } from './dto/update-user.response.dto'
+
+export interface GetOneParams {
+  id?: string
+  login?: string
+}
 
 @Injectable()
 export class UserService {
@@ -15,11 +21,19 @@ export class UserService {
       throw new NotFoundException('Пользователь не найден')
     }
 
-    await this.userRepository.update(user, dto)
+    user.email = dto.email
+
+    await this.userRepository.save(user)
+    return new UpdateUserResponseDto({ id: user.userId })
   }
 
-  async getOne(id: string) {
-    const user = await this.userRepository.findOneBy({ userId: id })
+  async getOne(params: GetOneParams) {
+    const searchParams = {
+      ...(params.id && { userId: params.id }),
+      ...(params.login && { login: params.login }),
+    }
+
+    const user = await this.userRepository.findOneBy(searchParams)
 
     if (!user) {
       throw new NotFoundException('Пользователь не найден')

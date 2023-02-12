@@ -1,5 +1,8 @@
-import { Body, Controller, HttpStatus, Post, UploadedFiles } from '@nestjs/common'
+import { Body, Controller, HttpStatus, Post, Put, Request } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { JwtToken } from '../auth/auth.types'
+import { ExtractUser } from '../common/decorators/extract-user-from-request'
+import { JwtAuthGuard } from '../common/guards/auth.guard'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UpdateUserResponseDto } from './dto/update-user.response.dto'
 import { UserService } from './user.service'
@@ -17,9 +20,9 @@ export class UserController {
     description: 'OK',
     type: UpdateUserResponseDto,
   })
-  @Post()
-  update(@Body() dto: UpdateUserDto) {
-    //TODO: jwt payload id
-    return this.userService.update('id', dto)
+  @JwtAuthGuard()
+  @Put()
+  update(@Body() dto: UpdateUserDto, @ExtractUser() user: JwtToken) {
+    return this.userService.update(user.id, dto)
   }
 }

@@ -8,6 +8,7 @@ import { APP_FILTER } from '@nestjs/core'
 import { ApplicationExceptionFilter } from './common/filters/application.filter'
 import { UserModule } from './user/user.module'
 import { NotificationModule } from './notification/notification.module'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NotificationModule } from './notification/notification.module'
     ApplicationModule,
     UserModule,
     NotificationModule,
+    AuthModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ApplicationExceptionFilter }],
 })
