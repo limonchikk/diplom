@@ -25,16 +25,20 @@ export class ApplicationService implements OnModuleInit {
   }
 
   async save(dto: CreateApplicationDto, files: Express.Multer.File[]) {
+    console.log(files)
     const application = new Application()
     application.applicantName = dto.name
     application.applicantSurname = dto.surname
+    application.applicantPatronymic = dto.patronymic
     application.applicantEmail = dto.email
     application.applicantPhoneNumber = dto.phoneNumber
     application.applicantSex = dto.sex
-    application.applicantCountry = dto.country
+    application.applicantRegistrationCountry = dto.registrationCountry
+    application.applicantLivingCountry = dto.livingCountry
     application.applicantBirthDate = dto.birthDate
     application.applicantResidenceVisaAvalibility = dto.residenceVisaAvalibility
     application.applicantPreferredDirectionOfStudy = dto.preferredDirectionOfStudy
+    application.representative = dto.representative
     application.documents = []
 
     try {
@@ -47,6 +51,7 @@ export class ApplicationService implements OnModuleInit {
           const documentEntity = new Document()
           documentEntity.documentId = documentId
           documentEntity.type = ApplicantDocumentType[f.fieldname as keyof typeof ApplicantDocumentType]
+          documentEntity.mimetype = f.mimetype
           application.documents.push(documentEntity)
         }),
       )

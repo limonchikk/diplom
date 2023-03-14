@@ -9,6 +9,7 @@ import { ApplicationExceptionFilter } from './common/filters/application.filter'
 import { UserModule } from './user/user.module'
 import { NotificationModule } from './notification/notification.module'
 import { AuthModule } from './auth/auth.module'
+import { DocumentModule } from './document/document.module'
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from './auth/auth.module'
     UserModule,
     NotificationModule,
     AuthModule,
+    DocumentModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ApplicationExceptionFilter }],
 })

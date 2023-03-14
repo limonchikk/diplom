@@ -12,6 +12,14 @@ export enum ApplicantSex {
   Female = 'female',
 }
 
+export type Representative = {
+  name: string
+  surname: string
+  patronymic: string
+  email: string
+  phoneNumber: string
+}
+
 @Entity({ name: 'applications' })
 export class Application extends Auditable {
   @PrimaryGeneratedColumn('uuid', {
@@ -31,6 +39,12 @@ export class Application extends Auditable {
     comment: "Applicant's surname",
   })
   applicantSurname: string
+
+  @Column({
+    name: 'applicant_patronymic',
+    comment: "Applicant's patronymic",
+  })
+  applicantPatronymic: string
 
   @Column({
     name: 'applicant_email',
@@ -53,10 +67,16 @@ export class Application extends Auditable {
   applicantSex: ApplicantSex
 
   @Column({
-    name: 'applicant_country',
-    comment: "Applicant's country",
+    name: 'applicant_registration_country',
+    comment: "Applicant's registration country",
   })
-  applicantCountry: string
+  applicantRegistrationCountry: string
+
+  @Column({
+    name: 'applicant_living_country',
+    comment: "Applicant's living country",
+  })
+  applicantLivingCountry: string
 
   @Column('date', {
     name: 'applicant_birth_date',
@@ -83,6 +103,13 @@ export class Application extends Auditable {
     default: false,
   })
   viewed: boolean
+
+  @Column({
+    comment: 'Applicant representative',
+    nullable: true,
+    type: 'jsonb',
+  })
+  representative?: Representative
 
   @OneToMany(() => Document, (doc) => doc.application, { cascade: ['insert', 'remove'] })
   documents: Document[]

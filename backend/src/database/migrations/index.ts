@@ -1,6 +1,13 @@
 import { AddApplicationAndDocument1676153871244 } from './1676153871244-AddApplicationAndDocument'
-import { AddUser1676149760819 } from './1676149760819-AddUser'
-import { AddUserEmail1676156585217 } from './1676156585217-AddUserEmail'
-import { AddUserLoginUnique1676157819204 } from './1676157819204-AddUserLoginUnique'
+import { AddRepresentativeAndFixApplicationFields1678807311355 } from './1678807311355-AddRepresentativeAndFixApplicationFields'
+import { AddUser1678813566778 } from './1678813566778-AddUser'
+import { DocumentFix1678813992145 } from './1678813992145-DocumentFix'
+import { AddCoumentMimetype1678815539291 } from './1678815539291-AddCoumentMimetype'
 
-export default [AddApplicationAndDocument1676153871244, AddUser1676149760819, AddUserEmail1676156585217, AddUserLoginUnique1676157819204]
+export default [
+  AddApplicationAndDocument1676153871244,
+  AddRepresentativeAndFixApplicationFields1678807311355,
+  AddUser1678813566778,
+  DocumentFix1678813992145,
+  AddCoumentMimetype1678815539291,
+]

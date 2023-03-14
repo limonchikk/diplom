@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Application } from './application.entity'
 
 export enum ApplicantDocumentType {
@@ -32,6 +32,13 @@ export class Document {
   })
   type!: ApplicantDocumentType
 
+  @Column({
+    comment: 'Document mimtype',
+    nullable: false,
+  })
+  mimetype!: string
+
   @ManyToOne(() => Application, (applicant) => applicant.documents)
+  @JoinColumn({ name: 'application' })
   application!: Application
 }

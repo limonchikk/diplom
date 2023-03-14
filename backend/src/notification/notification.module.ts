@@ -13,27 +13,30 @@ import { NotificationController } from './notification.controller'
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        transport: {
-          host: config.get('mailer.host'),
-          port: 465,
-          secure: true,
-          auth: {
-            user: config.get('mailer.user'),
-            pass: config.get('mailer.password'),
+      useFactory: (config: ConfigService) => {
+        console.log(config)
+        return {
+          transport: {
+            host: config.get('mailer.host'),
+            port: 465,
+            secure: true,
+            auth: {
+              user: config.get('mailer.user'),
+              pass: config.get('mailer.password'),
+            },
           },
-        },
-        template: {
-          dir: __dirname + '/templates',
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
+          template: {
+            dir: __dirname + '/templates',
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
           },
-        },
-        defaults: {
-          from: config.get('mailer.user'),
-        },
-      }),
+          defaults: {
+            from: config.get('mailer.user'),
+          },
+        }
+      },
     }),
     UserModule,
   ],
