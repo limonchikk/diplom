@@ -17,7 +17,7 @@ function Application() {
 
   return (
     <Row className={styles.applicationWrapper}>
-      <Col span={16} className={styles.application}>
+      <Col span={14} className={styles.application}>
         <Navbar showForm={showApplicationForm} />
         <div className={styles.applicationContent}>
           {show.applicationForm ? <ApplicationForm /> : <ApplicationQuestions />}

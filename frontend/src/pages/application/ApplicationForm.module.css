@@ -21,9 +21,6 @@ h4 {
   color: #707079;
 }
 
-.ant-picker {
+.formInput {
   width: 100%;
-}
-.ant-input {
-  padding: 7px 11px;
 }

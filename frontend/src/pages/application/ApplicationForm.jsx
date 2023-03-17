@@ -1,31 +1,33 @@
-import styles from './Application.module.css'
-import './ApplicationForm.module.css'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  Cascader,
-  DatePicker,
-  InputNumber,
-  TreeSelect,
-  Switch,
-  Checkbox,
-  Upload,
-  OTPInput,
-} from 'antd'
-
-import { useState } from 'react'
-
-const { RangePicker } = DatePicker
-const { TextArea } = Input
+import applicationStyles from './Application.module.css'
+import formStyles from './ApplicationForm.module.css'
+import { Form, Input, Button, Select, DatePicker } from 'antd'
+import { useState, useRef } from 'react'
+import { MaskedInput } from 'antd-mask-input'
+import { Row, Col } from 'antd'
+import InputMask from 'react-input-mask'
 
 function ApplicationForm() {
   let [phoneNumber, setPhoneNumber] = useState()
 
+  const formInputRef = useRef(null)
+
+  console.log(formInputRef)
+
+  const onFinish = values => {
+    console.log(values)
+    console.log({ ...values, phone: phoneNumber })
+  }
+
+  // useEffect(() => {
+  //   if (formInputRef.current) {
+  //     console.log(123)
+  //     IMask(formInputRef.current, maskOptions)
+  //   }
+  // }, [formInputRef.current])
+
   return (
     <>
-      <h2 className={styles.applicationHeading}>Форма подачи заявки на обучение</h2>
+      <h2 className={applicationStyles.applicationHeading}>Форма подачи заявки на обучение</h2>
       <p>Прием заявок осуществляется в период с 1 июля до 1 ноября</p>
       <h3>Обратите внимание:</h3>
       <ul>
@@ -34,76 +36,37 @@ function ApplicationForm() {
       </ul>
 
       <h4>Заявка на обучение</h4>
-      <Form>
-        <Form.Item>
-          <Input placeholder='ФИО' />
+      <Form onFinish={onFinish} size='large'>
+        <Form.Item name='fio'>
+          <Input placeholder='ФИО' className={formStyles.formInput} />
         </Form.Item>
-        <Form.Item>
-          <DatePicker placeholder='Дата рождения' />
+        <Form.Item name='birthDate'>
+          <DatePicker placeholder='Дата рождения' className={formStyles.formInput} />
         </Form.Item>
-        <Form.Item>
+        <Form.Item name='sex'>
           <Select placeholder='Пол'>
             <Select.Option value='male'>Мужской</Select.Option>
             <Select.Option value='female'>Женский</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item>
-          <Input
-            placeholder='Номер телефона'
-            onChange={e => {
-              const telNo = e.target.value
-              const re = /^[0-9\b]+$/
-              if (telNo === '' || re.test(telNo)) {
-                phoneNumber = setPhoneNumber(e.target.value)
-              }
+
+        <Form.Item name='phone'>
+          <MaskedInput
+            onChange={({ unmaskedValue }) => {
+              setPhoneNumber(unmaskedValue)
+              return unmaskedValue
             }}
-            type='number'
+            placeholder='Номер телефона'
+            mask={
+              //  https://imask.js.org/guide.html#masked-pattern
+              '+7(000)000-00-00'
+            }
           />
         </Form.Item>
 
-        {/* <Form.Item label='TreeSelect'>
-          <TreeSelect
-            treeData={[{ title: 'Light', value: 'light', children: [{ title: 'Bamboo', value: 'bamboo' }] }]}
-          />
-        </Form.Item>
-        <Form.Item label='Cascader'>
-          <Cascader
-            options={[
-              {
-                value: 'zhejiang',
-                label: 'Zhejiang',
-                children: [
-                  {
-                    value: 'hangzhou',
-                    label: 'Hangzhou',
-                  },
-                ],
-              },
-            ]}
-          />
-        </Form.Item>
-        <Form.Item label='RangePicker'>
-          <RangePicker />
-        </Form.Item>
-        <Form.Item label='InputNumber'>
-          <InputNumber />
-        </Form.Item>
-        <Form.Item label='TextArea'>
-          <TextArea rows={4} />
-        </Form.Item>
-        <Form.Item label='Switch' valuePropName='checked'>
-          <Switch />
-        </Form.Item>
-        <Form.Item label='Upload' valuePropName='fileList'>
-          <Upload action='/upload.do' listType='picture-card'>
-            <div>
-              <div style={{ marginTop: 8 }}>Upload</div>
-            </div>
-          </Upload>
-        </Form.Item>
-        <Form.Item label='Button'>
-          <Button>Button</Button>
-        </Form.Item> */}
+        <Button type='primary' htmlType='submit'>
+          Submit
+        </Button>
       </Form>
     </>
   )
