@@ -1,0 +1,24 @@
+.applicationWrapper {
+  background-color: rgba(0, 0, 0, 0.08);
+  padding: 70px 300px;
+}
+
+.application {
+  height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  /* justify-content: space-between; */
+}
+
+.applicationContent {
+  padding: 40px 80px;
+}
+
+.applicationHeading {
+  color: #157fc4;
+  font-size: 50px;
+  line-height: 70px;
+  font-family: 'Bitter', serif;
+}

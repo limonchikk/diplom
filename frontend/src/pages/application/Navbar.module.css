@@ -1,0 +1,14 @@
+.navbarElement {
+  text-align: center;
+}
+
+.navbarLink {
+  display: block;
+  padding: 10px;
+  border: 1px solid grey;
+  border-bottom: 2px solid grey;
+}
+
+.active {
+  background-color: #e1e7eb;
+}
