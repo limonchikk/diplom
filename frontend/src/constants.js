@@ -1,0 +1,6 @@
+export const STATUS_DICT = {
+    PENDING: 'PENDING',
+    FINISHED: 'FINISHED',
+    FAILED: 'FAILED',
+    DEFAULT: 'DEFAULT',
+}

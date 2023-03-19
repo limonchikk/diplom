@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import Navbar from './Navbar'
+import Navbar from '../../layout/NavBar/Navbar'
 import styles from './Application.module.css'
-import ApplicationForm from './ApplicationForm'
-import ApplicationQuestions from './ApplicationQuestions'
+import ApplicationForm from '../../features/application/components/ApplicationForm/ApplicationForm'
+import ApplicationQuestions from '../../features/application/components/ApplicationQuestions/ApplicationQuestions'
 import { Col, Row } from 'antd'
 
 function Application() {
@@ -17,7 +17,7 @@ function Application() {
 
   return (
     <Row className={styles.applicationWrapper}>
-      <Col span={14} className={styles.application}>
+      <Col span={18} className={styles.application}>
         <Navbar showForm={showApplicationForm} />
         <div className={styles.applicationContent}>
           {show.applicationForm ? <ApplicationForm /> : <ApplicationQuestions />}

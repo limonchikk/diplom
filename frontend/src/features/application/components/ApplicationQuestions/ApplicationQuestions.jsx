@@ -1,4 +1,4 @@
-import styles from './Application.module.css'
+import styles from '../../../../pages/application/Application.module.css'
 
 function ApplicationQuestions() {
   return (
