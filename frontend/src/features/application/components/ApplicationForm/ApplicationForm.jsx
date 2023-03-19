@@ -71,7 +71,7 @@ function ApplicationForm() {
       russianEducationDocument,
     }
 
-    console.log(applicantBirthDate)
+    console.log(data)
   }
 
   useEffect(() => {
@@ -88,9 +88,10 @@ function ApplicationForm() {
   useEffect(() => {
     if (representativePhoneNumberInputRef.current) {
       const mask = IMask(representativePhoneNumberInputRef.current.input, maskOptions)
+      console.log(mask)
       representativeUnmaskedPhoneNumberRef.current = mask
     }
-  }, [representativePhoneNumberInputRef.current, maskOptions])
+  }, [showRepresentative, representativePhoneNumberInputRef.current, maskOptions])
 
   return (
     <>
@@ -104,61 +105,160 @@ function ApplicationForm() {
 
       <h4>Заявка на обучение</h4>
       <Form onFinish={onFinish} size='large' layout='vertical'>
-        <Row gutter={[12, 12]}>
-          <Col span={8}>
-            <Form.Item name='name' label='Имя' required>
+        <Row gutter={100}>
+          <Col span={12}>
+            <Form.Item
+              name='name'
+              label='Имя'
+              rules={[
+                {
+                  message: 'Имя должно быть строкой',
+                  validator: (_, value) => {
+                    if (
+                      value &&
+                      (/^[a-zA-Z]+$/.test(value) ||
+                        /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                    ) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+              ]}
+              required
+            >
               <Input placeholder='Имя' className={formStyles.formInput} />
             </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item name='surname' label='Фамилия' required>
+            <Form.Item
+              name='surname'
+              label='Фамилия'
+              rules={[
+                {
+                  message: 'Фамилия должно быть строкой',
+                  validator: (_, value) => {
+                    if (
+                      value &&
+                      (/^[a-zA-Z]+$/.test(value) ||
+                        /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                    ) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+              ]}
+              required
+            >
               <Input placeholder='Фамилия' className={formStyles.formInput} />
             </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item name='patronymic' label='Отчество' required>
+            <Form.Item
+              name='patronymic'
+              label='Отчество'
+              rules={[
+                {
+                  message: 'Отчество должно быть строкой',
+                  validator: (_, value) => {
+                    if (
+                      value &&
+                      (/^[a-zA-Z]+$/.test(value) ||
+                        /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                    ) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+              ]}
+              required
+            >
               <Input placeholder='Отчество' className={formStyles.formInput} />
             </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={[12, 12]}>
-          <Col span={12}>
-            <Form.Item name='birthDate' label='Дата рождения' required>
+            <Form.Item
+              name='birthDate'
+              label='Дата рождения'
+              rules={[
+                {
+                  message: 'Дата рождения не указана',
+                  required: true,
+                },
+              ]}
+              required
+            >
               <DatePicker
                 placeholder='Дата рождения'
                 className={formStyles.formInput}
                 onChange={onApplicantBirthDateChange}
               />
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name='sex' label='Пол' required>
-              <Select placeholder='Пол'>
-                <Select.Option value='male'>Мужской</Select.Option>
-                <Select.Option value='female'>Женский</Select.Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={[12, 12]}>
-          <Col span={12}>
-            <Form.Item name='phoneNumber' label='Номер телефона' required>
+
+            <Form.Item
+              name='phoneNumber'
+              label='Номер телефона'
+              rules={[
+                {
+                  message: 'Номер телефона должен состоять из 11 цифр',
+                  validator: () => {
+                    if (
+                      /^\d+$/.test(applicantUnmaskedPhoneNumberRef.current.unmaskedValue) &&
+                      applicantUnmaskedPhoneNumberRef.current.unmaskedValue.length === 11
+                    ) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+              ]}
+              required
+            >
               <Input
                 placeholder='Номер телефона'
                 ref={applicantPhoneNumberInputRef}
                 // onChange={e => setApplicantUnmaskedPhoneNumber(e.target.value)}
               />
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name='email' label='Электронная почта' required>
+            <Form.Item
+              name='email'
+              label='Электронная почта'
+              rules={[
+                {
+                  required: true,
+                  message: 'Адрес электронной почты должен быть корректен',
+                  type: 'email',
+                },
+              ]}
+              required
+            >
               <Input placeholder='Электронная почта' type='email' />
             </Form.Item>
           </Col>
-        </Row>
-        <Row gutter={800}>
           <Col span={12}>
-            <Form.Item name='registrationCountry' label='Страна регистрации' required>
+            <Form.Item
+              name='sex'
+              label='Пол'
+              rules={[
+                {
+                  required: true,
+                  message: 'Пол не указан',
+                },
+              ]}
+              required
+            >
+              <Select placeholder='Пол'>
+                <Select.Option value='male'>Мужской</Select.Option>
+                <Select.Option value='female'>Женский</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name='registrationCountry'
+              label='Страна регистрации'
+              rules={[
+                {
+                  required: true,
+                  message: 'Страна регистрации не указана',
+                },
+              ]}
+              required
+            >
               <Select
                 showSearch
                 options={countries.data}
@@ -166,9 +266,17 @@ function ApplicationForm() {
                 placeholder='Страна регистрации'
               />
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name='livingCountry' label='Страна проживания' required>
+            <Form.Item
+              name='livingCountry'
+              label='Страна проживания'
+              rules={[
+                {
+                  required: true,
+                  message: 'Страна проживания не указана',
+                },
+              ]}
+              required
+            >
               <Select
                 showSearch
                 options={countries.data}
@@ -176,19 +284,33 @@ function ApplicationForm() {
                 placeholder='Страна проживания'
               />
             </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={[12, 12]}>
-          <Col span={12}>
-            <Form.Item name='residenceVisaAvalibility' label='Виза на проживание в России' required>
+            <Form.Item
+              name='residenceVisaAvalibility'
+              label='Виза на проживание в России'
+              rules={[
+                {
+                  required: true,
+                  message: 'Наличие визы на проживание в России не указано',
+                },
+              ]}
+              required
+            >
               <Select placeholder='Наличие визы не указано'>
                 <Select.Option value='hasVisa'>Есть виза на проживание</Select.Option>
                 <Select.Option value='noVisa'>Нет визы на проживание</Select.Option>
               </Select>
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name='preferredDirectionOfStudy' label='Профиль обучения' required>
+            <Form.Item
+              name='preferredDirectionOfStudy'
+              label='Профиль обучения'
+              rules={[
+                {
+                  required: true,
+                  message: 'Профиль обучения не указан',
+                },
+              ]}
+              required
+            >
               <Select placeholder='Профиль не выбран'>
                 <Select.Option value='medical'>Медицинский</Select.Option>
                 <Select.Option value='technical'>Инженерно-технический</Select.Option>
@@ -196,13 +318,19 @@ function ApplicationForm() {
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={[12, 12]}>
-          <Col span={24}>
+        <Row gutter={100}>
+          <Col span={12}>
             <Form.Item
               name='passportOriginal'
               label='Оригинал паспорта'
               layout='horizontal'
               valuePropName='file'
+              rules={[
+                {
+                  required: true,
+                  message: 'Файл оригинала паспорта не загружен или имеет некорректный формат',
+                },
+              ]}
               required
             >
               <Upload
@@ -220,106 +348,245 @@ function ApplicationForm() {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item
-          name='russianPassport'
-          label='Заверенный перевод паспорта на русский язык'
-          layout='horizontal'
-          valuePropName='file'
-          required
-        >
-          <Upload
-            beforeUpload={file => {
-              const isJPG = file.type === 'image/jpeg'
-              if (!isJPG) {
-                console.error('You can only upload JPG file!')
-              }
-              return false
-            }}
-            maxCount={1}
-          >
-            <Button icon={<UploadOutlined />}>Загрузить</Button>
-          </Upload>
-        </Form.Item>
-        <Form.Item
-          name='educationDocumentOriginal'
-          label='Документ об образовании'
-          layout='horizontal'
-          valuePropName='file'
-          required
-        >
-          <Upload
-            beforeUpload={file => {
-              const isJPG = file.type === 'image/jpeg'
-              if (!isJPG) {
-                console.error('You can only upload JPG file!')
-              }
-              return false
-            }}
-            maxCount={1}
-          >
-            <Button icon={<UploadOutlined />}>Загрузить</Button>
-          </Upload>
-        </Form.Item>
-        <Form.Item
-          name='russianEducationDocument'
-          label='Документ об образовании на русском языке'
-          layout='horizontal'
-          valuePropName='file'
-          required
-        >
-          <Upload
-            beforeUpload={file => {
-              const isJPG = file.type === 'image/jpeg'
-              if (!isJPG) {
-                console.error('You can only upload JPG file!')
-              }
-              return false
-            }}
-            maxCount={1}
-          >
-            <Button icon={<UploadOutlined />}>Загрузить</Button>
-          </Upload>
-        </Form.Item>
-        <Form.Item>
-          <Form.Item name='dataProcessingAccept' valuePropName='checked' noStyle required>
-            <Checkbox>Даю согласие на обработку данных</Checkbox>
-          </Form.Item>
-          <Form.Item name='isRepresentative' valuePropName='checked' onClick={onChecked}>
-            <Checkbox>Являюсь представителем заявителя</Checkbox>
-          </Form.Item>
-        </Form.Item>
+        <Row gutter={100}>
+          <Col span={12}>
+            <Form.Item
+              name='russianPassport'
+              label='Заверенный перевод паспорта на русский язык'
+              layout='horizontal'
+              valuePropName='file'
+              rules={[
+                {
+                  required: true,
+                  message:
+                    'Файл заверенного перевода паспорта на русский язык не загружен или имеет некорректный формат',
+                },
+              ]}
+              required
+            >
+              <Upload
+                beforeUpload={file => {
+                  const isJPG = file.type === 'image/jpeg'
+                  if (!isJPG) {
+                    console.error('You can only upload JPG file!')
+                  }
+                  return false
+                }}
+                maxCount={1}
+              >
+                <Button icon={<UploadOutlined />}>Загрузить</Button>
+              </Upload>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={100}>
+          <Col span={12}>
+            <Form.Item
+              name='educationDocumentOriginal'
+              label='Документ об образовании'
+              layout='horizontal'
+              valuePropName='file'
+              rules={[
+                {
+                  required: true,
+                  message: 'Файл документа об образовании не загружен или имеет некорректный формат',
+                },
+              ]}
+              required
+            >
+              <Upload
+                beforeUpload={file => {
+                  const isJPG = file.type === 'image/jpeg'
+                  if (!isJPG) {
+                    console.error('You can only upload JPG file!')
+                  }
+                  return false
+                }}
+                maxCount={1}
+              >
+                <Button icon={<UploadOutlined />}>Загрузить</Button>
+              </Upload>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={100}>
+          <Col span={12}>
+            <Form.Item
+              name='russianEducationDocument'
+              label='Документ об образовании на русском языке'
+              layout='horizontal'
+              valuePropName='file'
+              rules={[
+                {
+                  required: true,
+                  message: 'Файл документа об образовании на русском языке или имеет некорректный формат',
+                },
+              ]}
+              required
+            >
+              <Upload
+                beforeUpload={file => {
+                  const isJPG = file.type === 'image/jpeg'
+                  if (!isJPG) {
+                    console.error('You can only upload JPG file!')
+                  }
+                  return false
+                }}
+                maxCount={1}
+              >
+                <Button icon={<UploadOutlined />}>Загрузить</Button>
+              </Upload>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={100}>
+          <Col span={12}>
+            <Form.Item
+              name='dataProcessingAccept'
+              valuePropName='checked'
+              rules={[
+                {
+                  message: 'Необходимо дать согласие на обработку данных',
+                  validator: (_, value) => {
+                    if (value) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+              ]}
+              style={{ marginBottom: 0 }}
+              required
+            >
+              <Checkbox>Даю согласие на обработку данных</Checkbox>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={100}>
+          <Col span={12}>
+            <Form.Item name='isRepresentative' valuePropName='checked' style={{ marginBottom: 0 }} onClick={onChecked}>
+              <Checkbox>Являюсь представителем заявителя</Checkbox>
+            </Form.Item>
+          </Col>
+        </Row>
         {showRepresentative ? (
-          <>
-            <Row gutter={12}>
-              <Col span={8}>
-                <Form.Item name='representativeName' label='Имя представителя' required>
-                  <Input placeholder='Имя представителя' className={formStyles.formInput} />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item name='representativeSurname' label='Фамилия представителя' required>
-                  <Input placeholder='Фамилия представителя' className={formStyles.formInput} />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item name='representativePatronymic' label='Отчество представителя' required>
-                  <Input placeholder='Отчество представителя' className={formStyles.formInput} />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Form.Item name='representativePhoneNumber' label='Номер телефона представителя' required>
-              <Input placeholder='Номер телефона представителя' ref={representativePhoneNumberInputRef} />
+          <Row gutter={100}>
+            <Col span={12}>
+              <Form.Item
+                name='representativeName'
+                label='Имя представителя'
+                rules={[
+                  {
+                    message: 'Имя представителя должно быть строкой',
+                    validator: (_, value) => {
+                      if (
+                        value &&
+                        (/^[a-zA-Z]+$/.test(value) ||
+                          /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                      ) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject()
+                    },
+                  },
+                ]}
+                required
+              >
+                <Input placeholder='Имя представителя' className={formStyles.formInput} />
+              </Form.Item>
+              <Form.Item
+                name='representativeSurname'
+                label='Фамилия представителя'
+                rules={[
+                  {
+                    message: 'Фамилия представителя должно быть строкой',
+                    validator: (_, value) => {
+                      if (
+                        value &&
+                        (/^[a-zA-Z]+$/.test(value) ||
+                          /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                      ) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject()
+                    },
+                  },
+                ]}
+                required
+              >
+                <Input placeholder='Фамилия представителя' className={formStyles.formInput} />
+              </Form.Item>
+              <Form.Item
+                name='representativePatronymic'
+                label='Отчество представителя'
+                rules={[
+                  {
+                    message: 'Отчество представителя должно быть строкой',
+                    validator: (_, value) => {
+                      if (
+                        value &&
+                        (/^[a-zA-Z]+$/.test(value) ||
+                          /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                      ) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject()
+                    },
+                  },
+                ]}
+                required
+              >
+                <Input placeholder='Отчество представителя' className={formStyles.formInput} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name='representativePhoneNumber'
+                label='Номер телефона представителя'
+                rules={[
+                  {
+                    message: 'Номер телефона представителя должен состоять из 11 цифр',
+                    validator: (_, value) => {
+                      if (
+                        /^\d+$/.test(representativePhoneNumberInputRef.current.unmaskedValue) &&
+                        representativePhoneNumberInputRef.current.unmaskedValue.length === 11
+                      ) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject()
+                    },
+                  },
+                ]}
+                required
+              >
+                <Input placeholder='Номер телефона представителя' ref={representativePhoneNumberInputRef} />
+              </Form.Item>
+              <Form.Item
+                name='representativeEmail'
+                label='Электронная почта представителя'
+                rules={[
+                  {
+                    message: 'Адрес электронной почты представителя должен быть корректен',
+                    type: 'email',
+                    required: true,
+                  },
+                ]}
+                required
+              >
+                <Input placeholder='Электронная почта представителя' type='email' />
+              </Form.Item>
+            </Col>
+          </Row>
+        ) : null}
+        <Row gutter={100}>
+          <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
+            <Form.Item valuePropName='checked' required>
+              <Button type='primary' htmlType='submit'>
+                Подать заявление
+              </Button>
             </Form.Item>
-            <Form.Item name='representativeEmail' label='Электронная почта представителя' required>
-              <Input placeholder='Электронная почта представителя' type='email' />
-            </Form.Item>
-          </>
-        ) : null}{' '}
-        <Form.Item valuePropName='checked' required>
-          <Button type='primary' htmlType='submit' style={{ margin: '0 auto' }}>
-            Подать заявление
-          </Button>
-        </Form.Item>
+          </Col>
+        </Row>
       </Form>
     </>
   )
