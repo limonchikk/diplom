@@ -1,12 +1,12 @@
 import applicationStyles from '../../../../pages/application/Application.module.css'
 import formStyles from './ApplicationForm.module.css'
-import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox } from 'antd'
+import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox, message } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { useRef, useEffect, useState } from 'react'
 import IMask from 'imask'
 import { STATUS_DICT } from '../../../../constants'
 import { useSelector, useDispatch } from 'react-redux'
-import { getCountries } from '../../applicationSlice'
+import { applyApplicationForm, getCountries } from '../../applicationSlice'
 import axios from 'axios'
 
 const maskOptions = {
@@ -15,13 +15,24 @@ const maskOptions = {
 
 function ApplicationForm() {
   const dispatch = useDispatch()
+
   const countries = useSelector(state => state.default.application.countries)
+  const applicationFormResult = useSelector(state => state.default.application.applicationForm)
+
   const applicantPhoneNumberInputRef = useRef(null)
   const applicantUnmaskedPhoneNumberRef = useRef(null)
   const representativePhoneNumberInputRef = useRef(null)
   const representativeUnmaskedPhoneNumberRef = useRef(null)
   const [applicantBirthDate, setApplicantBirthDate] = useState('')
   const [showRepresentative, setShowRepresentative] = useState(false)
+
+  const onFileLoading = () => {
+    message.success('Загружаем файл...')
+  }
+
+  const onFileLoaded = () => {
+    message.success('Файл успешно загружен!', 2)
+  }
 
   const onApplicantBirthDateChange = (date, dateString) => {
     setApplicantBirthDate(dateString)
@@ -74,17 +85,20 @@ function ApplicationForm() {
 
     console.log(data)
 
-    try {
-      const request = await axios.post('http://localhost:3001/api/applications', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+    dispatch(applyApplicationForm(data))
 
-      console.log(request)
-    } catch (err) {
-      console.log(err.response.data)
-    }
+    // try {
+    //   const request = await axios.post('http://localhost:3001/api/applications', data, {
+    //     headers: {
+    //       'Content-Type': 'multipart/form-data',
+    //     },
+    //   })
+
+    //   console.log(request)
+    //   message.success('Submit success!')
+    // } catch (err) {
+    //   console.log(err.response.data)
+    // }
   }
 
   useEffect(() => {
@@ -116,7 +130,7 @@ function ApplicationForm() {
       </ul>
 
       <h4>Заявка на обучение</h4>
-      <Form onFinish={onFinish} size='large' layout='vertical'>
+      <Form onFinish={onFinish} size='large' layout='vertical' validateTrigger='onBlur'>
         <Row gutter={100}>
           <Col span={12}>
             <Form.Item
@@ -224,7 +238,7 @@ function ApplicationForm() {
               ]}
               required
             >
-              <Input placeholder='Номер телефона' ref={applicantPhoneNumberInputRef} />
+              <Input placeholder='Номер телефона' ref={applicantPhoneNumberInputRef} autoComplete='new-password' />
             </Form.Item>
             <Form.Item
               name='email'
@@ -351,6 +365,11 @@ function ApplicationForm() {
                   }
                   return false
                 }}
+                onChange={info => {
+                  if (info.file.size && info.fileList.length) {
+                    onFileLoaded()
+                  }
+                }}
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Загрузить</Button>
@@ -382,6 +401,11 @@ function ApplicationForm() {
                   }
                   return false
                 }}
+                onChange={info => {
+                  if (info.file.size && info.fileList.length) {
+                    onFileLoaded()
+                  }
+                }}
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Загрузить</Button>
@@ -412,6 +436,11 @@ function ApplicationForm() {
                   }
                   return false
                 }}
+                onChange={info => {
+                  if (info.file.size && info.fileList.length) {
+                    onFileLoaded()
+                  }
+                }}
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Загрузить</Button>
@@ -441,6 +470,11 @@ function ApplicationForm() {
                     console.error('You can only upload JPG file!')
                   }
                   return false
+                }}
+                onChange={info => {
+                  if (info.file.size && info.fileList.length) {
+                    onFileLoaded()
+                  }
                 }}
                 maxCount={1}
               >
@@ -558,21 +592,25 @@ function ApplicationForm() {
                     message: 'Номер телефона представителя должен состоять из 11 цифр',
                     validator: (_, value) => {
                       console.log(value)
-                      console.log(representativePhoneNumberInputRef)
-                      return Promise.resolve()
-                      // if (
-                      //   /^\d+$/.test(representativePhoneNumberInputRef.current.unmaskedValue) &&
-                      //   representativePhoneNumberInputRef.current.unmaskedValue.length === 11
-                      // ) {
-                      //   return Promise.resolve()
-                      // }
-                      // return Promise.reject()
+                      console.log(representativeUnmaskedPhoneNumberRef)
+                      // return Promise.resolve()
+                      if (
+                        /^\d+$/.test(representativeUnmaskedPhoneNumberRef.current.unmaskedValue) &&
+                        representativeUnmaskedPhoneNumberRef.current.unmaskedValue.length === 11
+                      ) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject()
                     },
                   },
                 ]}
                 required
               >
-                <Input placeholder='Номер телефона представителя' ref={representativePhoneNumberInputRef} />
+                <Input
+                  placeholder='Номер телефона представителя'
+                  ref={representativePhoneNumberInputRef}
+                  autoComplete='new-password'
+                />
               </Form.Item>
               <Form.Item
                 name='representativeEmail'
@@ -594,7 +632,7 @@ function ApplicationForm() {
         <Row gutter={100}>
           <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
             <Form.Item valuePropName='checked' required>
-              <Button type='primary' htmlType='submit'>
+              <Button type='primary' htmlType='submit' loading={applicationFormResult.status === STATUS_DICT.PENDING}>
                 Подать заявление
               </Button>
             </Form.Item>
