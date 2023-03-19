@@ -236,12 +236,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     type: RepresentativeDto,
     required: false,
   })
-  //TODO: fixme
-  @Transform(({ value }) => {
-    if (typeof value === 'string' && value) return JSON.parse(value)
-    return null
-  })
-  @ValidateNested({ each: true })
+  @ValidateNested()
   @Type(() => RepresentativeDto)
   representative?: RepresentativeDto // +
 }

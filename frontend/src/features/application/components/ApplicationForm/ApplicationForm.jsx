@@ -7,6 +7,7 @@ import IMask from 'imask'
 import { STATUS_DICT } from '../../../../constants'
 import { useSelector, useDispatch } from 'react-redux'
 import { getCountries } from '../../applicationSlice'
+import axios from 'axios'
 
 const maskOptions = {
   mask: '+{7}(000)000-00-00',
@@ -33,7 +34,7 @@ function ApplicationForm() {
     return setShowRepresentative(false)
   }
 
-  const onFinish = values => {
+  const onFinish = async values => {
     const {
       passportOriginal,
       russianPassport,
@@ -65,13 +66,25 @@ function ApplicationForm() {
       birthDate: applicantBirthDate,
       phoneNumber: applicantUnmaskedPhoneNumberRef?.current?.unmaskedValue,
       representative,
-      passportOriginal,
-      russianPassport,
-      educationDocumentOriginal,
-      russianEducationDocument,
+      passportOriginal: passportOriginal.file,
+      russianPassport: russianPassport.file,
+      educationDocumentOriginal: educationDocumentOriginal.file,
+      russianEducationDocument: russianEducationDocument.file,
     }
 
     console.log(data)
+
+    try {
+      const request = await axios.post('http://localhost:3001/api/applications', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      console.log(request)
+    } catch (err) {
+      console.log(err.response.data)
+    }
   }
 
   useEffect(() => {
@@ -83,15 +96,14 @@ function ApplicationForm() {
       const mask = IMask(applicantPhoneNumberInputRef.current.input, maskOptions)
       applicantUnmaskedPhoneNumberRef.current = mask
     }
-  }, [applicantPhoneNumberInputRef.current, maskOptions])
+  }, [applicantPhoneNumberInputRef])
 
   useEffect(() => {
     if (representativePhoneNumberInputRef.current) {
       const mask = IMask(representativePhoneNumberInputRef.current.input, maskOptions)
-      console.log(mask)
       representativeUnmaskedPhoneNumberRef.current = mask
     }
-  }, [showRepresentative, representativePhoneNumberInputRef.current, maskOptions])
+  }, [representativePhoneNumberInputRef, showRepresentative])
 
   return (
     <>
@@ -197,7 +209,9 @@ function ApplicationForm() {
               rules={[
                 {
                   message: 'Номер телефона должен состоять из 11 цифр',
-                  validator: () => {
+                  validator: (_, value) => {
+                    console.log(value)
+                    console.log(applicantUnmaskedPhoneNumberRef)
                     if (
                       /^\d+$/.test(applicantUnmaskedPhoneNumberRef.current.unmaskedValue) &&
                       applicantUnmaskedPhoneNumberRef.current.unmaskedValue.length === 11
@@ -210,11 +224,7 @@ function ApplicationForm() {
               ]}
               required
             >
-              <Input
-                placeholder='Номер телефона'
-                ref={applicantPhoneNumberInputRef}
-                // onChange={e => setApplicantUnmaskedPhoneNumber(e.target.value)}
-              />
+              <Input placeholder='Номер телефона' ref={applicantPhoneNumberInputRef} />
             </Form.Item>
             <Form.Item
               name='email'
@@ -296,8 +306,8 @@ function ApplicationForm() {
               required
             >
               <Select placeholder='Наличие визы не указано'>
-                <Select.Option value='hasVisa'>Есть виза на проживание</Select.Option>
-                <Select.Option value='noVisa'>Нет визы на проживание</Select.Option>
+                <Select.Option value={true}>Есть виза на проживание</Select.Option>
+                <Select.Option value={false}>Нет визы на проживание</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item
@@ -547,13 +557,16 @@ function ApplicationForm() {
                   {
                     message: 'Номер телефона представителя должен состоять из 11 цифр',
                     validator: (_, value) => {
-                      if (
-                        /^\d+$/.test(representativePhoneNumberInputRef.current.unmaskedValue) &&
-                        representativePhoneNumberInputRef.current.unmaskedValue.length === 11
-                      ) {
-                        return Promise.resolve()
-                      }
-                      return Promise.reject()
+                      console.log(value)
+                      console.log(representativePhoneNumberInputRef)
+                      return Promise.resolve()
+                      // if (
+                      //   /^\d+$/.test(representativePhoneNumberInputRef.current.unmaskedValue) &&
+                      //   representativePhoneNumberInputRef.current.unmaskedValue.length === 11
+                      // ) {
+                      //   return Promise.resolve()
+                      // }
+                      // return Promise.reject()
                     },
                   },
                 ]}

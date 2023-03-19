@@ -6,6 +6,7 @@ import { SwaggerBuilder } from './common/swagger'
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule)
+  app.enableCors()
   const config = app.get(ConfigService)
 
   SwaggerBuilder(app, config, Logger)
