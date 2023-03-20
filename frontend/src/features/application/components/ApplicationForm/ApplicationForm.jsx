@@ -1,13 +1,14 @@
 import applicationStyles from '../../../../pages/application/Application.module.css'
 import formStyles from './ApplicationForm.module.css'
-import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox, message } from 'antd'
+import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox, notification, App } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { useRef, useEffect, useState } from 'react'
 import IMask from 'imask'
 import { STATUS_DICT } from '../../../../constants'
 import { useSelector, useDispatch } from 'react-redux'
-import { applyApplicationForm, getCountries } from '../../applicationSlice'
-import axios from 'axios'
+import { applyApplicationForm, getCountries, resetApplicationForm } from '../../applicationSlice'
+
+import moment from 'moment'
 
 const maskOptions = {
   mask: '+{7}(000)000-00-00',
@@ -15,23 +16,23 @@ const maskOptions = {
 
 function ApplicationForm() {
   const dispatch = useDispatch()
-
+  const [form] = Form.useForm()
   const countries = useSelector(state => state.default.application.countries)
   const applicationFormResult = useSelector(state => state.default.application.applicationForm)
-
   const applicantPhoneNumberInputRef = useRef(null)
   const applicantUnmaskedPhoneNumberRef = useRef(null)
   const representativePhoneNumberInputRef = useRef(null)
   const representativeUnmaskedPhoneNumberRef = useRef(null)
   const [applicantBirthDate, setApplicantBirthDate] = useState('')
   const [showRepresentative, setShowRepresentative] = useState(false)
-
-  const onFileLoading = () => {
-    message.success('Загружаем файл...')
-  }
+  const [api, contextHolder] = notification.useNotification()
 
   const onFileLoaded = () => {
-    message.success('Файл успешно загружен!', 2)
+    api.info({
+      message: `Файл успешно загружен!`,
+      placement: 'bottomRight',
+      duration: 2,
+    })
   }
 
   const onApplicantBirthDateChange = (date, dateString) => {
@@ -86,20 +87,21 @@ function ApplicationForm() {
     console.log(data)
 
     dispatch(applyApplicationForm(data))
-
-    // try {
-    //   const request = await axios.post('http://localhost:3001/api/applications', data, {
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data',
-    //     },
-    //   })
-
-    //   console.log(request)
-    //   message.success('Submit success!')
-    // } catch (err) {
-    //   console.log(err.response.data)
-    // }
   }
+
+  useEffect(() => {
+    if (applicationFormResult.status === STATUS_DICT.FINISHED) {
+      api.success({
+        message: `Заявка успешно отправлена!`,
+        placement: 'bottomRight',
+        duration: 2,
+        onClose: () => {
+          dispatch(resetApplicationForm())
+          form.resetFields()
+        },
+      })
+    }
+  }, [dispatch, applicationFormResult.status])
 
   useEffect(() => {
     dispatch(getCountries())
@@ -121,6 +123,7 @@ function ApplicationForm() {
 
   return (
     <>
+      {contextHolder}
       <h2 className={applicationStyles.applicationHeading}>Форма подачи заявки на обучение</h2>
       <p>Прием заявок осуществляется в период с 1 июля до 1 ноября</p>
       <h3>Обратите внимание:</h3>
@@ -130,31 +133,9 @@ function ApplicationForm() {
       </ul>
 
       <h4>Заявка на обучение</h4>
-      <Form onFinish={onFinish} size='large' layout='vertical' validateTrigger='onBlur'>
+      <Form onFinish={onFinish} size='large' layout='vertical' validateTrigger='onBlur' form={form}>
         <Row gutter={100}>
           <Col span={12}>
-            <Form.Item
-              name='name'
-              label='Имя'
-              rules={[
-                {
-                  message: 'Имя должно быть строкой',
-                  validator: (_, value) => {
-                    if (
-                      value &&
-                      (/^[a-zA-Z]+$/.test(value) ||
-                        /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
-                    ) {
-                      return Promise.resolve()
-                    }
-                    return Promise.reject()
-                  },
-                },
-              ]}
-              required
-            >
-              <Input placeholder='Имя' className={formStyles.formInput} />
-            </Form.Item>
             <Form.Item
               name='surname'
               label='Фамилия'
@@ -177,6 +158,29 @@ function ApplicationForm() {
             >
               <Input placeholder='Фамилия' className={formStyles.formInput} />
             </Form.Item>
+            <Form.Item
+              name='name'
+              label='Имя'
+              rules={[
+                {
+                  message: 'Имя должно быть строкой',
+                  validator: (_, value) => {
+                    if (
+                      value &&
+                      (/^[a-zA-Z]+$/.test(value) ||
+                        /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                    ) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+              ]}
+              required
+            >
+              <Input placeholder='Имя' className={formStyles.formInput} />
+            </Form.Item>
+
             <Form.Item
               name='patronymic'
               label='Отчество'
@@ -205,7 +209,28 @@ function ApplicationForm() {
               rules={[
                 {
                   message: 'Дата рождения не указана',
-                  required: true,
+                  validator: (_, value) => {
+                    if (value) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
+                },
+                {
+                  message: 'Ваш возраст превышает допустимый',
+                  validator: (_, value) => {
+                    const momentApplicantBirthDate = moment(applicantBirthDate)
+                    const strict40 = moment().subtract(40, 'years')
+                    const isUnder40 = momentApplicantBirthDate.diff(strict40) >= 0
+
+                    const strict18 = moment().subtract(18, 'years')
+                    const isAbove18 = momentApplicantBirthDate.diff(strict18) <= 0
+
+                    if (!value || (applicantBirthDate && isUnder40 && isAbove18)) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject()
+                  },
                 },
               ]}
               required
@@ -365,6 +390,7 @@ function ApplicationForm() {
                   }
                   return false
                 }}
+                accept='image/png, image/jpeg'
                 onChange={info => {
                   if (info.file.size && info.fileList.length) {
                     onFileLoaded()
@@ -406,6 +432,7 @@ function ApplicationForm() {
                     onFileLoaded()
                   }
                 }}
+                accept='image/png, image/jpeg'
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Загрузить</Button>
@@ -441,6 +468,7 @@ function ApplicationForm() {
                     onFileLoaded()
                   }
                 }}
+                accept='image/png, image/jpeg'
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Загрузить</Button>
@@ -476,6 +504,7 @@ function ApplicationForm() {
                     onFileLoaded()
                   }
                 }}
+                accept='image/png, image/jpeg'
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Загрузить</Button>
@@ -517,28 +546,6 @@ function ApplicationForm() {
           <Row gutter={100}>
             <Col span={12}>
               <Form.Item
-                name='representativeName'
-                label='Имя представителя'
-                rules={[
-                  {
-                    message: 'Имя представителя должно быть строкой',
-                    validator: (_, value) => {
-                      if (
-                        value &&
-                        (/^[a-zA-Z]+$/.test(value) ||
-                          /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
-                      ) {
-                        return Promise.resolve()
-                      }
-                      return Promise.reject()
-                    },
-                  },
-                ]}
-                required
-              >
-                <Input placeholder='Имя представителя' className={formStyles.formInput} />
-              </Form.Item>
-              <Form.Item
                 name='representativeSurname'
                 label='Фамилия представителя'
                 rules={[
@@ -560,6 +567,29 @@ function ApplicationForm() {
               >
                 <Input placeholder='Фамилия представителя' className={formStyles.formInput} />
               </Form.Item>
+              <Form.Item
+                name='representativeName'
+                label='Имя представителя'
+                rules={[
+                  {
+                    message: 'Имя представителя должно быть строкой',
+                    validator: (_, value) => {
+                      if (
+                        value &&
+                        (/^[a-zA-Z]+$/.test(value) ||
+                          /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
+                      ) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject()
+                    },
+                  },
+                ]}
+                required
+              >
+                <Input placeholder='Имя представителя' className={formStyles.formInput} />
+              </Form.Item>
+
               <Form.Item
                 name='representativePatronymic'
                 label='Отчество представителя'
