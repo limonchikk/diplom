@@ -17,6 +17,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('signin')
   signIn(@Body() data: AuthDto): Promise<AuthTokens> {
+    console.log(data)
     return this.authService.signIn(data)
   }
 }

@@ -1,6 +1,7 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 import * as argon2 from 'argon2'
+import { Exclude } from 'class-transformer'
 
 export enum Role {
   Admin = 'admin',
@@ -25,6 +26,7 @@ export class User {
     comment: 'Хеш пароля',
     nullable: false,
   })
+  @Exclude()
   password!: string
 
   @Column({

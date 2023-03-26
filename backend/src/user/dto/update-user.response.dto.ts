@@ -7,7 +7,14 @@ export class UpdateUserResponseDto {
   })
   id: string
 
+  @ApiProperty({
+    description: 'Адрес электронной почты',
+    type: String,
+  })
+  email: string
+
   constructor(props: UpdateUserResponseDto) {
     this.id = props.id
+    this.email = props.email
   }
 }

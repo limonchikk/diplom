@@ -24,7 +24,7 @@ export class UserService {
     user.email = dto.email
 
     await this.userRepository.save(user)
-    return new UpdateUserResponseDto({ id: user.userId })
+    return new UpdateUserResponseDto({ id: user.userId, email: user.email })
   }
 
   async getOne(params: GetOneParams) {

@@ -1,9 +1,12 @@
-import { Body, Controller, HttpStatus, Post, UploadedFiles } from '@nestjs/common'
+import { Body, Controller, Get, HttpStatus, Post, Query, UploadedFiles } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiFile } from '../common/decorators/api-file'
+import { Application } from '../models'
 import { ApplicationService } from './application.service'
 import { CreateApplicationDto, ApplicationDocumentsDto } from './dto/create-application.dto'
 import { CreateApplicationResponseDto } from './dto/create-application.response.dto'
+import { FindApplicationParamDto } from './dto/find-application-param.dto'
+import { FindApplicationResponseDto } from './dto/find-applications.response.dto'
 
 @ApiTags('Заявки на обучение для иностранных граждан')
 @Controller('applications')
@@ -25,5 +28,17 @@ export class ApplicationController {
       dto,
       Object.values(files).map((v) => v[0]),
     )
+  }
+
+  @ApiOperation({
+    summary: 'Получение заявок',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'OK',
+  })
+  @Get()
+  find(@Query() query: FindApplicationParamDto): Promise<FindApplicationResponseDto> {
+    return this.applicationService.find(query)
   }
 }

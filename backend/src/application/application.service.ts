@@ -10,10 +10,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { CreateApplicationResponseDto } from './dto/create-application.response.dto'
 import { Document } from '../models'
 import { ApplicantDocumentType } from '../models/document.entity'
+import { FindApplicationParamDto } from './dto/find-application-param.dto'
+import { FindApplicationResponseDto } from './dto/find-applications.response.dto'
 
 @Injectable()
 export class ApplicationService implements OnModuleInit {
-  constructor(@InjectRepository(Application) private applicantRepository: Repository<Application>, private readonly appConfig: ConfigService) {}
+  constructor(@InjectRepository(Application) private applicationRepository: Repository<Application>, private readonly appConfig: ConfigService) {}
 
   async onModuleInit() {
     const folderName = this.appConfig.get('files.folder') as string
@@ -56,7 +58,7 @@ export class ApplicationService implements OnModuleInit {
         }),
       )
 
-      const data = await this.applicantRepository.save(application)
+      const data = await this.applicationRepository.save(application)
       return new CreateApplicationResponseDto({ id: data.applicationId })
     } catch (err) {
       console.log(err)
@@ -68,5 +70,10 @@ export class ApplicationService implements OnModuleInit {
 
       throw new BadRequestException('Произошла неизвестная ошибка при оформлении заявки')
     }
+  }
+
+  async find(params: FindApplicationParamDto) {
+    const [applications, count] = await this.applicationRepository.findAndCountBy(params)
+    return new FindApplicationResponseDto({ applications, count })
   }
 }
