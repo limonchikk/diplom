@@ -1,0 +1,34 @@
+.adminPanelWrapper {
+  padding: 70px 140px;
+}
+
+.adminPanelHeading h1 {
+  font-size: 35px;
+  padding-bottom: 15px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+}
+
+.adminPageInputEmail {
+  padding: 0;
+  border: none;
+  outline: none;
+}
+
+.adminPanelNavBarItem {
+  padding: 70px 20px 70px 20px;
+  display: block;
+  border: 2px solid #0d66a7;
+  border-radius: 10px;
+  background-color: #f6f7f8;
+  text-align: center;
+  height: 100%;
+  background-color: #f2f5fe;
+  color: #00477a;
+  font-size: 23px;
+  font-weight: 300;
+}
+
+.active {
+  background-color: #cbd7f0;
+}

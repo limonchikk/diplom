@@ -1,10 +1,13 @@
 import React, { useCallback } from 'react'
+import css from './Link.module.css'
 
 function AHrefJavascript({ children, onClick, ...props }) {
   const handleClick = useCallback(
     e => {
       e.preventDefault()
-      return onClick(e)
+      if (onClick) {
+        return onClick(e)
+      }
     },
     [onClick]
   )

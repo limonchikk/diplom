@@ -1,0 +1,17 @@
+.loginForm {
+  padding: 50px 80px 50px 80px;
+  border: 1px solid #0d66a7;
+  border-radius: 10px;
+  background-color: #f6f7f8;
+}
+
+.loginHeading {
+  font-size: 35px;
+  padding-bottom: 25px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.loginSubmitBtn {
+  margin-top: 10px;
+  min-width: 135px;
+}

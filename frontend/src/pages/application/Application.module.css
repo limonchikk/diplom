@@ -13,12 +13,5 @@
 }
 
 .applicationContent {
-  padding: 40px 80px;
-}
-
-.applicationHeading {
-  color: #0d66a7;
-  font-size: 35px;
-  padding-bottom: 25px;
-  font-family: 'Bitter', serif;
+  padding: 50px 80px;
 }

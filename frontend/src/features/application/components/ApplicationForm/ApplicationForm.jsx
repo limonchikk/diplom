@@ -1,4 +1,3 @@
-import applicationStyles from '../../../../pages/application/Application.module.css'
 import formStyles from './ApplicationForm.module.css'
 import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox, notification, App } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
@@ -7,6 +6,7 @@ import IMask from 'imask'
 import { STATUS_DICT } from '../../../../constants'
 import { useSelector, useDispatch } from 'react-redux'
 import { applyApplicationForm, getCountries, resetApplicationForm } from '../../applicationSlice'
+import applicationFormStyles from './ApplicationForm.module.css'
 
 import moment from 'moment'
 
@@ -124,15 +124,17 @@ function ApplicationForm() {
   return (
     <>
       {contextHolder}
-      <h2 className={applicationStyles.applicationHeading}>Форма подачи заявки на обучение</h2>
-      <p>Прием заявок осуществляется в период с 1 июля до 1 ноября</p>
-      <h3>Обратите внимание:</h3>
-      <ul>
-        <li>1. Заявление подается на платное обучение</li>
-        <li>2. Возраст заявителя должен находится в пределах от 18 до 40 лет</li>
-      </ul>
+      <div className={applicationFormStyles.heading}>
+        <h2>Форма подачи заявки на обучение</h2>
+        <p>Прием заявок осуществляется в период с 1 июля до 1 ноября</p>
+        <h3>Обратите внимание:</h3>
+        <ul>
+          <li>1. Заявление подается на платное обучение</li>
+          <li>2. Возраст заявителя должен находится в пределах от 18 до 40 лет</li>
+        </ul>
+        <h4>Заявка на обучение</h4>
+      </div>
 
-      <h4>Заявка на обучение</h4>
       <Form onFinish={onFinish} size='large' layout='vertical' validateTrigger='onBlur' form={form}>
         <Row gutter={100}>
           <Col span={12}>
@@ -141,7 +143,7 @@ function ApplicationForm() {
               label='Фамилия'
               rules={[
                 {
-                  message: 'Фамилия должно быть строкой',
+                  message: 'Фамилия должнa быть строкой',
                   validator: (_, value) => {
                     if (
                       value &&
@@ -662,7 +664,12 @@ function ApplicationForm() {
         <Row gutter={100}>
           <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
             <Form.Item valuePropName='checked' required>
-              <Button type='primary' htmlType='submit' loading={applicationFormResult.status === STATUS_DICT.PENDING}>
+              <Button
+                type='primary'
+                className={`btn ${formStyles.submitFormBtn}`}
+                htmlType='submit'
+                loading={applicationFormResult.status === STATUS_DICT.PENDING}
+              >
                 Подать заявление
               </Button>
             </Form.Item>

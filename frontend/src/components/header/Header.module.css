@@ -2,6 +2,23 @@
   padding: 40px 70px;
 }
 
+.header h1,
+h2 {
+  margin: 0;
+}
+
+.header h1 {
+  font-size: 1rem;
+  padding-bottom: 7px;
+  color: grey;
+  font-family: 'PT Sans', sans-serif;
+}
+
+.header h2 {
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+}
+
 .headerLogo {
   min-width: 115px;
 }
@@ -16,22 +33,4 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-h1,
-h2 {
-  margin: 0;
-}
-
-h1 {
-  font-size: 1rem;
-  padding-bottom: 7px;
-  color: grey;
-  font-family: 'PT Sans', sans-serif;
-}
-
-h2 {
-  font-weight: bold;
-  color: #0d66a7;
-  font-family: 'Inter', sans-serif;
 }

@@ -1,35 +1,50 @@
-p,
-li,
-h3 {
+.heading h2 {
+  font-size: 30px;
+  /* padding-bottom: 25px;
+  padding-top: 10px; */
+  padding-bottom: 25px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.heading p,
+.heading li,
+.heading h3 {
   color: #828282;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 25px;
+  /* padding: 4px 0; */
 }
 
-p {
-  padding-bottom: 12px;
-}
-
-h3 {
+.heading h3 {
   font-weight: bold;
   padding-bottom: 7px;
 }
 
-ul {
-  list-style: none;
-}
-
-h4 {
+.heading h4 {
   padding-top: 50px;
   padding-bottom: 35px;
   text-align: center;
   text-transform: uppercase;
   color: #707079;
   font-weight: 500;
+  font-size: 16px;
+}
+
+.heading p {
+  /* padding-top: 12px; */
+  padding-bottom: 12px;
+}
+
+ul {
+  list-style: none;
 }
 
 .formInput {
   width: 100%;
+}
+
+.submitFormBtn {
+  margin-top: 25px;
 }
 
 span {
