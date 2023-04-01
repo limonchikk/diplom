@@ -1,18 +1,26 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { STATUS_DICT } from '../../constants'
-import { fetchApplications, fetchApplyApplicationForm, fetchCountries, fetchDocuments } from '../../api/application'
+import {
+  fetchApplications,
+  fetchApplyApplicationForm,
+  fetchCountries,
+  fetchDocuments,
+  sendQuestion,
+} from '../../api/application'
 
 const initialState = {
   countries: { status: STATUS_DICT.DEFAULT, data: [] },
   applicationForm: { status: STATUS_DICT.DEFAULT, applicationId: null },
   applications: { status: STATUS_DICT.DEFAULT, data: null },
   documents: { status: STATUS_DICT.DEFAULT, data: null },
+  question: { status: STATUS_DICT.DEFAULT, data: null },
 }
 
 export const getCountries = createAsyncThunk('getCountries', async () => fetchCountries())
 export const applyApplicationForm = createAsyncThunk('applyForm', async data => fetchApplyApplicationForm(data))
 export const getApplications = createAsyncThunk('getApplications', async params => fetchApplications(params))
 export const getDocuments = createAsyncThunk('getDocument', async params => fetchDocuments(params))
+export const sendApplicantQuestion = createAsyncThunk('sendQuestion', async data => sendQuestion(data))
 
 const applicationSlice = createSlice({
   name: 'application',
@@ -25,6 +33,10 @@ const applicationSlice = createSlice({
     resetApplications: state => {
       state.applications.status = STATUS_DICT.DEFAULT
       state.applications.data = null
+    },
+    resetQuestion: state => {
+      state.question.status = STATUS_DICT.DEFAULT
+      state.question.data = null
     },
   },
   extraReducers: builder => {
@@ -69,9 +81,19 @@ const applicationSlice = createSlice({
       .addCase(getDocuments.rejected, state => {
         state.documents.status = STATUS_DICT.FAILED
       })
+      .addCase(sendApplicantQuestion.pending, state => {
+        state.question.status = STATUS_DICT.PENDING
+      })
+      .addCase(sendApplicantQuestion.fulfilled, (state, action) => {
+        state.question.status = STATUS_DICT.FINISHED
+        state.question.data = action.payload
+      })
+      .addCase(sendApplicantQuestion.rejected, state => {
+        state.question.status = STATUS_DICT.FAILED
+      })
   },
 })
 
-export const { resetApplicationForm, resetApplications } = applicationSlice.actions
+export const { resetApplicationForm, resetApplications, resetQuestion } = applicationSlice.actions
 
 export default applicationSlice.reducer

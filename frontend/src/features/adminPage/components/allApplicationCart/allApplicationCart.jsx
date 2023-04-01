@@ -1,7 +1,6 @@
-import { Button, Table, Typography } from 'antd'
-import { DownloadOutlined } from '@ant-design/icons'
+import { Button, Table } from 'antd'
 import { useEffect, useState } from 'react'
-import { getApplications, getDocuments, resetApplications } from '../../../application/applicationSlice'
+import { getApplications, resetApplications } from '../../../application/applicationSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { STATUS_DICT } from '../../../../constants'
 import css from './AllApplicationCart.module.css'
@@ -11,15 +10,11 @@ import { fetchDocuments } from '../../../../api/application'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 
-const zip = new JSZip()
-
 moment.locale()
 
 function AllApplicationCart() {
   const { status, data } = useSelector(state => state.default.application.applications)
-  // const documentsRaw = useSelector(state => state.default.application.documents)
   const [state, setState] = useState({ data: [] })
-  const [docs, setDocs] = useState([])
   const [loadings, setLoadings] = useState([])
   const dispatch = useDispatch()
 
@@ -32,18 +27,11 @@ function AllApplicationCart() {
 
     const zip = new JSZip()
 
-    const docs = await fetchDocuments(zip, documents)
+    await fetchDocuments(zip, documents)
 
     zip.generateAsync({ type: 'blob' }).then(function (blob) {
       saveAs(blob, `${applicantFio}.zip`)
     })
-
-    // for (let doc of documents) {
-    //   let a = `http://localhost:3000${doc.documentId}`
-    //   a.click()
-    // }
-
-    // dispatch(getDocuments(documents))
 
     setTimeout(() => {
       setLoadings(prevLoadings => {
@@ -53,28 +41,6 @@ function AllApplicationCart() {
       })
     }, 1000)
   }
-
-  // useEffect(() => {
-  //   if (documentsRaw.status === STATUS_DICT.FINISHED) {
-  //     setDocs(documentsRaw.data)
-
-  //     console.log('zz')
-  //     const url = window.URL.createObjectURL(new Blob([documentsRaw.data[0]]))
-  //     console.log(url)
-  //     const link = document.createElement('a')
-  //     link.href = url
-  //     link.setAttribute('download', `FileName.png`)
-
-  //     // Append to html link element page
-  //     document.body.appendChild(link)
-
-  //     // Start download
-  //     link.click()
-
-  //     // Clean up and remove the link
-  //     link.parentNode.removeChild(link)
-  //   }
-  // }, [documentsRaw.data, documentsRaw.status])
 
   const tableColumns = [
     {

@@ -1,0 +1,57 @@
+.heading {
+  margin-bottom: 50px;
+}
+
+.heading h2 {
+  font-size: 30px;
+  /* padding-bottom: 25px;
+  padding-top: 10px; */
+  padding-bottom: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.applicationQuestion p {
+  color: #828282;
+}
+
+.heading ul {
+  list-style-type: decimal;
+  padding-top: 35px;
+  padding-left: 20px;
+}
+
+.heading li {
+  font-size: 17px;
+  /* padding-bottom: 25px;
+  padding-top: 10px; */
+  padding-bottom: 25px;
+  font-family: 'Inter', sans-serif;
+  /* font-family: 'Roboto', sans-serif; */
+}
+
+.applicantQuestionFormBlock p {
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 30px;
+}
+.applicantQuestionForm label {
+  color: #828282;
+}
+
+.submitFormBtn {
+  margin-top: 15px;
+}
+
+.applicantQuestionFormBlock form {
+  padding-top: 25px;
+}
+
+.heading li b {
+  font-weight: 500;
+}
+.heading li p {
+  font-weight: 300;
+  font-size: 17px;
+  margin-top: 12px;
+  line-height: 30px;
+}

@@ -21,32 +21,22 @@ export const fetchApplications = params =>
   })
 
 export const fetchDocuments = (zip, params) => {
-  console.log(123)
-  console.log(params)
-  console.log(321)
   return Promise.all(
     params.map(doc => {
       return axiosInstance
         .get('http://localhost:3001/api/documents', {
           params: { id: doc.documentId },
-          // headers: { 'Content-Type': 'application/octet-stream' },
           responseType: 'blob',
         })
         .then(res => {
           let contentDisposition = res.headers['content-disposition']
           const fileName = contentDisposition.split('filename=')[1].split(';')[0]
           zip.file(fileName, res.data)
-          // let url = window.URL.createObjectURL(res.data)
-          // let link = document.createElement('a')
-          // link.href = url
-          // link.setAttribute('download', contentDisposition.split('filename=')[1].split(';')[0])
-
-          // return { fileName: contentDisposition.split('filename=')[1].split(';')[0], file: res.data }
-
-          //  document.body.append(link)
-          // link.click()
-          // return {}
         })
     })
   )
+}
+
+export const sendQuestion = data => {
+  return axiosInstance.post('http://localhost:3001/api/notifications/sendMail', data).then(res => res.data.id)
 }
