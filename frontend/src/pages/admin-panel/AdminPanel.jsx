@@ -7,6 +7,7 @@ import { STATUS_DICT } from '../../constants'
 import AHrefJavascript from '../../components/link-js/Link'
 import NewApplicationCart from '../../features/adminPage/components/newApplicationCart/NewApplicationCart'
 import { getApplications } from '../../features/application/applicationSlice'
+import AllApplicationCart from '../../features/adminPage/components/allApplicationCart/allApplicationCart'
 
 // const childComponents = [
 //   {
@@ -42,6 +43,8 @@ const AdminPanel = () => {
 
   const childComponents = {
     newApplication: <NewApplicationCart count={setCount} />,
+    allApplication: <AllApplicationCart />,
+    analytic: <NewApplicationCart count={setCount} />,
   }
 
   useEffect(() => {

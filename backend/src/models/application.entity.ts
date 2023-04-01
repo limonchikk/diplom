@@ -29,22 +29,10 @@ export class Application extends Auditable {
   readonly applicationId!: string
 
   @Column({
-    name: 'applicant_name',
-    comment: "Applicant's name",
+    name: 'applicant_fio',
+    comment: "Applicant's fio",
   })
-  applicantName: string
-
-  @Column({
-    name: 'applicant_surname',
-    comment: "Applicant's surname",
-  })
-  applicantSurname: string
-
-  @Column({
-    name: 'applicant_patronymic',
-    comment: "Applicant's patronymic",
-  })
-  applicantPatronymic: string
+  applicantFio: string
 
   @Column({
     name: 'applicant_email',

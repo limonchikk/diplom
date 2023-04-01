@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, ILike } from 'typeorm'
 import { CreateApplicationDto } from './dto/create-application.dto'
 import { Application } from '../models'
 import fs from 'fs/promises'
@@ -27,11 +27,8 @@ export class ApplicationService implements OnModuleInit {
   }
 
   async save(dto: CreateApplicationDto, files: Express.Multer.File[]) {
-    console.log(files)
     const application = new Application()
-    application.applicantName = dto.name
-    application.applicantSurname = dto.surname
-    application.applicantPatronymic = dto.patronymic
+    application.applicantFio = [dto.name, dto.surname, dto.patronymic].join(' ')
     application.applicantEmail = dto.email
     application.applicantPhoneNumber = dto.phoneNumber
     application.applicantSex = dto.sex
@@ -72,8 +69,29 @@ export class ApplicationService implements OnModuleInit {
     }
   }
 
+  async getOne(id: string) {
+    const application = await this.applicationRepository.findOne({ where: { applicationId: id }, relations: { documents: true } })
+
+    if (!application) {
+      throw new NotFoundException('Application not found')
+    }
+    return application
+  }
+
   async find(params: FindApplicationParamDto) {
-    const [applications, count] = await this.applicationRepository.findAndCountBy(params)
+    if ((params.searchBy && !params.text) || (!params.searchBy && params.text)) {
+      throw new BadRequestException('Bad search filter')
+    }
+
+    const { text, searchBy, ...data } = params
+
+    const [applications, count] = await this.applicationRepository.findAndCount({
+      where: {
+        ...data,
+        ...(text && searchBy && { [searchBy]: ILike(`%${text}%`) }),
+      },
+      relations: { documents: true },
+    })
     return new FindApplicationResponseDto({ applications, count })
   }
 }

@@ -65,9 +65,9 @@ function ApplicationForm() {
 
     if (representativeEmail && representativePhoneNumber && isRepresentative) {
       Object.assign(representative, {
-        name: representativeName,
-        surname: representativeSurname,
-        patronymic: representativePatronymic,
+        name: representativeName.trim(),
+        surname: representativeSurname.trim(),
+        patronymic: representativePatronymic.trim(),
         email: representativeEmail,
         phoneNumber: representativeUnmaskedPhoneNumberRef?.current?.unmaskedValue,
       })
@@ -95,11 +95,9 @@ function ApplicationForm() {
         message: `Заявка успешно отправлена!`,
         placement: 'bottomRight',
         duration: 2,
-        onClose: () => {
-          dispatch(resetApplicationForm())
-          form.resetFields()
-        },
       })
+      dispatch(resetApplicationForm())
+      form.resetFields()
     }
   }, [dispatch, applicationFormResult.status])
 

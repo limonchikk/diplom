@@ -12,12 +12,11 @@ export class DocumentService {
 
   async getOne(id: string) {
     const documentData = await this.documentRepository.findOne({ where: { documentId: id }, relations: { application: true } })
-    console.log(documentData)
     if (!documentData) {
       throw new NotFoundException('Документ не найден')
     }
-    const { applicantName, applicantSurname, applicantPatronymic } = documentData.application
-    const fileName = `${applicantName}_${applicantSurname}_${applicantPatronymic}`
+    const { applicantFio } = documentData.application
+    const fileName = applicantFio.replaceAll(' ', '_')
 
     return {
       fileName,

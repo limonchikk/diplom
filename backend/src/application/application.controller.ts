@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpStatus, Post, Query, UploadedFiles } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiFile } from '../common/decorators/api-file'
+import { JwtAuthGuard } from '../common/guards/auth.guard'
 import { Application } from '../models'
 import { ApplicationService } from './application.service'
 import { CreateApplicationDto, ApplicationDocumentsDto } from './dto/create-application.dto'
@@ -37,6 +38,7 @@ export class ApplicationController {
     status: HttpStatus.OK,
     description: 'OK',
   })
+  @JwtAuthGuard()
   @Get()
   find(@Query() query: FindApplicationParamDto): Promise<FindApplicationResponseDto> {
     return this.applicationService.find(query)

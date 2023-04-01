@@ -1,6 +1,5 @@
 import { Row, Col, Collapse, Descriptions } from 'antd'
 import css from './NewApplicationCart.module.css'
-import { v4 as uuidv4, v4 } from 'uuid'
 import { useEffect, useState } from 'react'
 import { getApplications, resetApplications } from '../../../application/applicationSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,7 +21,7 @@ function NewApplicationCart({ count }) {
   }, [data, status])
 
   useEffect(() => {
-    dispatch(getApplications())
+    dispatch(getApplications({ viewed: false }))
     return () => dispatch(resetApplications())
   }, [dispatch])
 
@@ -31,9 +30,7 @@ function NewApplicationCart({ count }) {
       <Col span={24}>
         {state.data.map((application, id) => (
           <Collapse key={application.applicationId}>
-            <Panel
-              header={`${application.applicantSurname} ${application.applicantName} ${application.applicantPatronymic}`}
-            >
+            <Panel header={application.applicantFio}>
               <Row gutter={60}>
                 <Col span={12}>
                   <Descriptions layout='horizontal' column={1} bordered>
