@@ -18,11 +18,11 @@ export class DocumentController {
     description: 'OK',
   })
   @Get()
-  // @JwtAuthGuard()
+  @JwtAuthGuard()
   async get(@Query() query: GetDocumentDto, @Res() response: Response) {
     const fileData = await this.documentService.getOne(query.id)
     response.set({
-      'Content-Disposition': `attachment; filename=${fileData.documentType}.png`,
+      'Content-Disposition': `attachment; filename=${fileData.documentType}.${fileData.mimetype.split('/')[1]}`,
       'Access-Control-Expose-Headers': 'Content-Disposition',
       'Content-Type': fileData.mimetype,
     })
