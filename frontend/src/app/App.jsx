@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../components/header/Header'
+import Header from '../features/application/components/ApplicationHeader/ApplicationHeader'
 import '../styles/App.css'
 import { AppRouter } from './AppRouter'
 import { Provider } from 'react-redux'

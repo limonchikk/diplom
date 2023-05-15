@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd'
 import { useState } from 'react'
-import AHrefJavascript from '../../components/link-js/Link'
-import styles from './Navbar.module.css'
+import AHrefJavascript from '../../../../common/components/link-js/Link'
+import styles from './ApplicationNavbar.module.css'
 
 function Navbar({ showForm }) {
   let [active, setActive] = useState({ form: true, questions: false })

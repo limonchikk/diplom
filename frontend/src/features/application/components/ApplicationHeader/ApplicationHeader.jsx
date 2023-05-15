@@ -1,5 +1,5 @@
-import Logo from '../../common/img/logo.webp'
-import styles from './Header.module.css'
+import Logo from '../../../../common/img/logo.webp'
+import styles from './ApplicationHeader.module.css'
 import { Col, Row } from 'antd'
 
 function Header() {

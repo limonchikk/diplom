@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react'
-import css from './Link.module.css'
 
 function AHrefJavascript({ children, onClick, ...props }) {
   const handleClick = useCallback(

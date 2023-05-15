@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Navbar from '../../layout/NavBar/Navbar'
+import Navbar from '../../features/application/components/ApplicationNavBar/ApplicationNavbar'
 import styles from './Application.module.css'
 import ApplicationForm from '../../features/application/components/ApplicationForm/ApplicationForm'
 import ApplicationQuestions from '../../features/application/components/ApplicationQuestions/ApplicationQuestions'

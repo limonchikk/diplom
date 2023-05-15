@@ -4,9 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import css from './AdminPanel.module.css'
 import { getAdminData, updateAdminData } from '../../features/adminPage/adminPageSlice'
 import { STATUS_DICT } from '../../constants'
-import AHrefJavascript from '../../components/link-js/Link'
+import AHrefJavascript from '../../common/components/link-js/Link'
 import NewApplicationCart from '../../features/adminPage/components/newApplicationCart/NewApplicationCart'
-import { getApplications } from '../../features/application/applicationSlice'
 import AllApplicationCart from '../../features/adminPage/components/allApplicationCart/allApplicationCart'
 
 // const childComponents = [
@@ -28,7 +27,7 @@ const AdminPanel = () => {
   const { data, status } = useSelector(state => state.default.admin.adminData)
   const applicationsRaw = useSelector(state => state.default.application.applications)
   const [email, setEmail] = useState('')
-  const [applications, setApplications] = useState({ applications: [], count: 0 })
+  const [_, setApplications] = useState({ applications: [], count: 0 })
   const [isAdminDataUpdate, setAdminDataUpdate] = useState(false)
   const dispatch = useDispatch()
   const [messageApi, contextHolder] = message.useMessage()
