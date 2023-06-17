@@ -14,7 +14,6 @@ import { NotificationController } from './notification.controller'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        console.log(config)
         return {
           transport: {
             host: config.get('mailer.host'),

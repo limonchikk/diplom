@@ -1,4 +1,4 @@
-import { Button, Table } from 'antd'
+import { Button, Table, Input, Cascader, Checkbox, Spin, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { getApplications, resetApplications } from '../../../application/applicationSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -14,9 +14,72 @@ moment.locale()
 
 function AllApplicationCart() {
   const { status, data } = useSelector(state => state.default.application.applications)
-  const [state, setState] = useState({ data: [] })
+  const [state, setState] = useState({ data: [], searchData: [] })
   const [loadings, setLoadings] = useState([])
+  let [active, setActive] = useState('spin')
   const dispatch = useDispatch()
+
+  const searchOptions = [
+    {
+      value: 'applicantFio',
+      label: 'ФИО',
+    },
+    {
+      value: 'applicantRegistrationCountry',
+      label: 'Регистрация',
+    },
+    {
+      value: 'applicantLivingCountry',
+      label: 'Проживание',
+    },
+    {
+      value: 'applicantPhoneNumber',
+      label: 'Телефон',
+    },
+    {
+      value: 'applicantEmail',
+      label: 'Почта',
+    },
+    {
+      value: 'applicantPreferredDirectionOfStudy',
+      label: 'Направление',
+    },
+  ]
+
+  const [search, setSearch] = useState({ field: [searchOptions[0].value], text: '' })
+  const [showRepresentative, setShowRepresentative] = useState(false)
+
+  const representative = s => {
+    setShowRepresentative(s)
+  }
+
+  const updateTableRows = () => {
+    const { field, text } = search
+
+    if (text && field && field.length) {
+      setState({
+        ...state,
+        searchData: state.data.filter(ap => {
+          let value = ap[field[0]]
+          if (field[0] === 'applicantPreferredDirectionOfStudy') {
+            if (value === 'medical') {
+              value = 'Медицинское'
+            } else {
+              value = 'Инженерно-техническое'
+            }
+          }
+
+          if (value.match(new RegExp(`^${text}`, 'i'))) {
+            return true
+          }
+          return false
+        }),
+      })
+      return
+    }
+
+    dispatch(getApplications())
+  }
 
   const downloadDocs = async (documents, idx, applicantFio) => {
     setLoadings(prevLoadings => {
@@ -27,7 +90,11 @@ function AllApplicationCart() {
 
     const zip = new JSZip()
 
-    await fetchDocuments(zip, documents)
+    const docsData = await fetchDocuments(zip, documents)
+
+    docsData.forEach(d => {
+      zip.file(d.fileName, d.data)
+    })
 
     zip.generateAsync({ type: 'blob' }).then(function (blob) {
       saveAs(blob, `${applicantFio}.zip`)
@@ -40,6 +107,24 @@ function AllApplicationCart() {
         return newLoadings
       })
     }, 1000)
+  }
+
+  const tableColumProps = (e, idx) => {
+    let style = { fontSize: '12px', fontWeight: '300' }
+    if (idx % 2 === 0) {
+      Object.assign(style, { backgroundColor: '#CBD7F0' })
+    } else {
+      Object.assign(style, { backgroundColor: '#FFF' })
+    }
+    return {
+      ...e,
+      key: e.dataIndex,
+      ellipsis: false,
+      align: 'center',
+      colSpan: 1,
+      style,
+      className: css.test,
+    }
   }
 
   const tableColumns = [
@@ -88,20 +173,36 @@ function AllApplicationCart() {
       dataIndex: 'documents',
       fixed: 'right',
     },
-  ].map(e => ({
-    ...e,
-    key: e.dataIndex,
-    ellipsis: false,
-    align: 'center',
-    colSpan: 1,
-    style: { fontSize: '12px', fontWeight: '300' },
-    className: css.test,
-  }))
+  ]
+
+  const getTableCols = showR => {
+    if (!showR) {
+      const res = tableColumns.map((e, idx) => {
+        return tableColumProps(e, idx)
+      })
+      return res
+    }
+
+    const copy = [...tableColumns]
+
+    copy.splice(1, 0, { title: 'Представитель', dataIndex: 'representative' })
+    const res = copy.map((e, idx) => {
+      return tableColumProps(e, idx)
+    })
+    return res
+  }
 
   const mapTableData = (application, idx) => {
     return {
       key: application.applicationId,
       applicantFio: application.applicantFio.trim(),
+      representative: application.representative
+        ? `${application.representative.name} ${application.representative.surname} ${
+            application.representative.patronymic ?? ''
+          }
+        ${application.representative.phoneNumber}
+        ${application.representative.email}`
+        : 'нет',
       applicantBirthDate: moment(application.applicantBirthDate).subtract(10, 'days').format('DD.MM.YYYY'),
       applicantSex: application.applicantSex === 'male' ? 'мужской' : 'женский',
       applicantRegistrationCountry: application.applicantRegistrationCountry,
@@ -111,11 +212,11 @@ function AllApplicationCart() {
         application.applicantPreferredDirectionOfStudy === 'medical' ? 'Медицинское' : 'Инженерно-техническое',
       applicantPhoneNumber: application.applicantPhoneNumber,
       applicantEmail: application.applicantEmail,
-      createdAt: moment(application.createdAt).subtract(10, 'days').format('LT, DD.MM.YYYY'),
+      createdAt: moment(application.createdAt).local().format('DD.MM.YYYY, LT'),
       documents: (
         <Button
           type='link'
-          loading={loadings[0]}
+          loading={loadings[idx]}
           onClick={() => downloadDocs(application.documents, idx, application.applicantFio.trim())}
         >
           Скачать
@@ -126,7 +227,7 @@ function AllApplicationCart() {
 
   useEffect(() => {
     if (status === STATUS_DICT.FINISHED) {
-      setState(prevState => ({ ...prevState, data: data.applications }))
+      setState(prevState => ({ ...prevState, data: data.applications, searchData: data.applications }))
     }
   }, [data, status])
 
@@ -136,15 +237,53 @@ function AllApplicationCart() {
   }, [dispatch])
 
   return (
-    <Table
-      columns={tableColumns}
-      dataSource={state.data.map(mapTableData)}
-      pagination={false}
-      size='default'
-      style={{ textAlign: 'center', width: '100%' }}
-      bordered={true}
-      scroll={{ x: 'max-content' }}
-    />
+    <>
+      <Input
+        addonAfter={
+          <Cascader
+            placeholder='Поле поиска'
+            className={css.cascader}
+            options={searchOptions}
+            size='large'
+            style={{ textAlign: 'center' }}
+            value={search.field}
+            onChange={e => {
+              return setSearch({ ...search, field: e })
+            }}
+            onBlur={updateTableRows}
+          />
+        }
+        size='large'
+        value={search.text}
+        onChange={e => setSearch({ ...search, text: e.target.value })}
+        onBlur={updateTableRows}
+      />
+      <Checkbox
+        style={{ paddingTop: '25px', paddingBottom: '25px' }}
+        onChange={e => representative(e.target.checked)}
+        className={css.rep}
+      >
+        Показать представителей
+      </Checkbox>
+      <div>
+        <Spin className={active === '' ? css.active : null} style={{ display: 'none' }} />
+        <Table
+          columns={getTableCols(showRepresentative)}
+          dataSource={state.searchData.map(mapTableData)}
+          pagination={false}
+          size='default'
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            whiteSpace: 'pre-line',
+          }}
+          bordered={false}
+          scroll={{ x: 'max-content' }}
+          className={css.allApplicationTable}
+          loading={status === STATUS_DICT.PENDING}
+        />
+      </div>
+    </>
   )
 }
 

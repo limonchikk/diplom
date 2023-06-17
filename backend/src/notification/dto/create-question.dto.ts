@@ -1,14 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsString } from 'class-validator'
+import { IsEmail, IsEnum, IsString } from 'class-validator'
 
-export class CreateQuestionDto {
+export enum NotificationType {
+  question = 'question',
+  application = 'application',
+}
+
+export class CreateNotificationDto {
   @ApiProperty({
-    description: 'Вопрос абитуриента',
+    description: 'Текст сообщения',
     type: String,
     required: true,
   })
-  @IsString({ message: 'Вопрос абитуриента должен быть строкой' })
-  question!: string
+  @IsString({ message: 'Текст сообщения должен быть строкой' })
+  text!: string
+
+  @ApiProperty({
+    description: 'Тип сообщения',
+    type: String,
+    required: true,
+  })
+  @IsString({ message: 'Тип сообщения должен быть корректным' })
+  @IsEnum(NotificationType)
+  type!: NotificationType
 
   // @ApiProperty({
   //   description: 'Имя абитуриента',

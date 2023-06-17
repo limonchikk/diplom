@@ -1,35 +1,26 @@
 import formStyles from './ApplicationForm.module.css'
-import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox, notification, App } from 'antd'
+import { Form, Input, Button, Select, DatePicker, Row, Col, Upload, Checkbox, notification, Space, Spin } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import { useRef, useEffect, useState } from 'react'
-import IMask from 'imask'
+import { useEffect, useState } from 'react'
 import { STATUS_DICT } from '../../../../constants'
 import { useSelector, useDispatch } from 'react-redux'
-import { applyApplicationForm, getCountries, resetApplicationForm } from '../../applicationSlice'
+import { applyApplicationForm, getCountries, resetApplicationForm, sendApplicantQuestion } from '../../applicationSlice'
 import applicationFormStyles from './ApplicationForm.module.css'
 
 import moment from 'moment'
-
-const maskOptions = {
-  mask: '+{7}(000)000-00-00',
-}
 
 function ApplicationForm() {
   const dispatch = useDispatch()
   const [form] = Form.useForm()
   const countries = useSelector(state => state.default.application.countries)
   const applicationFormResult = useSelector(state => state.default.application.applicationForm)
-  const applicantPhoneNumberInputRef = useRef(null)
-  const applicantUnmaskedPhoneNumberRef = useRef(null)
-  const representativePhoneNumberInputRef = useRef(null)
-  const representativeUnmaskedPhoneNumberRef = useRef(null)
   const [applicantBirthDate, setApplicantBirthDate] = useState('')
   const [showRepresentative, setShowRepresentative] = useState(false)
   const [api, contextHolder] = notification.useNotification()
 
   const onFileLoaded = () => {
     api.info({
-      message: `Файл успешно загружен!`,
+      message: `File successfuly uploaded!`,
       placement: 'bottomRight',
       duration: 2,
     })
@@ -55,9 +46,10 @@ function ApplicationForm() {
       representativeName,
       representativeSurname,
       representativePatronymic,
-      representativePhoneNumber,
       representativeEmail,
       isRepresentative,
+      phoneNumber,
+      representativePhoneNumber,
       ...applicantFormData
     } = values
 
@@ -67,16 +59,18 @@ function ApplicationForm() {
       Object.assign(representative, {
         name: representativeName.trim(),
         surname: representativeSurname.trim(),
-        patronymic: representativePatronymic.trim(),
         email: representativeEmail,
-        phoneNumber: representativeUnmaskedPhoneNumberRef?.current?.unmaskedValue,
+        phoneNumber: representativePhoneNumber,
       })
+      if (representativePatronymic) {
+        representative.patronymic = representativePatronymic.trim()
+      }
     }
 
     const data = {
       ...applicantFormData,
       birthDate: applicantBirthDate,
-      phoneNumber: applicantUnmaskedPhoneNumberRef?.current?.unmaskedValue,
+      phoneNumber: phoneNumber,
       representative,
       passportOriginal: passportOriginal.file,
       russianPassport: russianPassport.file,
@@ -84,18 +78,44 @@ function ApplicationForm() {
       russianEducationDocument: russianEducationDocument.file,
     }
 
-    console.log(data)
+    let notificationText = `${values.surname} ${values.name}. Номер телефона: ${phoneNumber}`
+
+    if (representative.hasOwnProperty('name')) {
+      notificationText = notificationText.concat(
+        `\nПредставитель: ${representativeName.trim()} ${representativeSurname.trim()}. Номер телефона представителя: ${representativePhoneNumber}`
+      )
+    }
 
     dispatch(applyApplicationForm(data))
+    dispatch(
+      sendApplicantQuestion({
+        type: 'application',
+        text: notificationText,
+        email: representativeEmail,
+      })
+    )
   }
+
+  const dateFormatList = ['DD.MM.YYYY']
 
   useEffect(() => {
     if (applicationFormResult.status === STATUS_DICT.FINISHED) {
-      api.success({
-        message: `Заявка успешно отправлена!`,
-        placement: 'bottomRight',
-        duration: 2,
-      })
+      if (applicationFormResult.data.errors) {
+        api.error({
+          message: `${applicationFormResult.data.errors.reduce((acc, e) => {
+            return acc + e.message + '\n'
+          }, '')}`,
+          placement: 'topRight',
+          duration: 5,
+        })
+      } else {
+        api.success({
+          message: `Application was successfuly sent!`,
+          placement: 'bottomRight',
+          duration: 2,
+        })
+      }
+
       dispatch(resetApplicationForm())
       form.resetFields()
     }
@@ -105,32 +125,18 @@ function ApplicationForm() {
     dispatch(getCountries())
   }, [dispatch])
 
-  useEffect(() => {
-    if (applicantPhoneNumberInputRef.current) {
-      const mask = IMask(applicantPhoneNumberInputRef.current.input, maskOptions)
-      applicantUnmaskedPhoneNumberRef.current = mask
-    }
-  }, [applicantPhoneNumberInputRef])
-
-  useEffect(() => {
-    if (representativePhoneNumberInputRef.current) {
-      const mask = IMask(representativePhoneNumberInputRef.current.input, maskOptions)
-      representativeUnmaskedPhoneNumberRef.current = mask
-    }
-  }, [representativePhoneNumberInputRef, showRepresentative])
-
   return (
     <>
       {contextHolder}
       <div className={applicationFormStyles.heading}>
-        <h2>Форма подачи заявки на обучение</h2>
-        <p>Прием заявок осуществляется в период с 1 июля до 1 ноября</p>
-        <h3>Обратите внимание:</h3>
+        <h2>Application form</h2>
+        <p>Applications are accepted from July 1 to November 1</p>
+        <h3>Note:</h3>
         <ul>
-          <li>1. Заявление подается на платное обучение</li>
-          <li>2. Возраст заявителя должен находится в пределах от 18 до 40 лет</li>
+          <li>1. Application is submitted for paid education</li>
+          <li>2. Applicant's age must be between 18 and 40 years old</li>
         </ul>
-        <h4>Заявка на обучение</h4>
+        <h4>Application for training</h4>
       </div>
 
       <Form onFinish={onFinish} size='large' layout='vertical' validateTrigger='onBlur' form={form}>
@@ -138,10 +144,10 @@ function ApplicationForm() {
           <Col span={12}>
             <Form.Item
               name='surname'
-              label='Фамилия'
+              label='Surname'
               rules={[
                 {
-                  message: 'Фамилия должнa быть строкой',
+                  message: 'Surname should be a string',
                   validator: (_, value) => {
                     if (
                       value &&
@@ -156,14 +162,14 @@ function ApplicationForm() {
               ]}
               required
             >
-              <Input placeholder='Фамилия' className={formStyles.formInput} />
+              <Input placeholder='Surname' className={formStyles.formInput} />
             </Form.Item>
             <Form.Item
               name='name'
-              label='Имя'
+              label='Name'
               rules={[
                 {
-                  message: 'Имя должно быть строкой',
+                  message: 'Name should be a string',
                   validator: (_, value) => {
                     if (
                       value &&
@@ -178,37 +184,18 @@ function ApplicationForm() {
               ]}
               required
             >
-              <Input placeholder='Имя' className={formStyles.formInput} />
+              <Input placeholder='Name' className={formStyles.formInput} />
             </Form.Item>
 
-            <Form.Item
-              name='patronymic'
-              label='Отчество'
-              rules={[
-                {
-                  message: 'Отчество должно быть строкой',
-                  validator: (_, value) => {
-                    if (
-                      value &&
-                      (/^[a-zA-Z]+$/.test(value) ||
-                        /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
-                    ) {
-                      return Promise.resolve()
-                    }
-                    return Promise.reject()
-                  },
-                },
-              ]}
-              required
-            >
-              <Input placeholder='Отчество' className={formStyles.formInput} />
+            <Form.Item name='patronymic' label='Patronymic (if available)'>
+              <Input placeholder='Patronymic' className={formStyles.formInput} />
             </Form.Item>
             <Form.Item
               name='birthDate'
-              label='Дата рождения'
+              label='Date of Birth'
               rules={[
                 {
-                  message: 'Дата рождения не указана',
+                  message: 'Date of Birth not specified',
                   validator: (_, value) => {
                     if (value) {
                       return Promise.resolve()
@@ -217,9 +204,11 @@ function ApplicationForm() {
                   },
                 },
                 {
-                  message: 'Ваш возраст превышает допустимый',
+                  message: 'Your age does not meet the requirements',
                   validator: (_, value) => {
-                    const momentApplicantBirthDate = moment(applicantBirthDate)
+                    let tmp = applicantBirthDate.split('.')
+
+                    const momentApplicantBirthDate = moment(`${tmp[2]}-${tmp[1]}-${tmp[0]}`)
                     const strict40 = moment().subtract(40, 'years')
                     const isUnder40 = momentApplicantBirthDate.diff(strict40) >= 0
 
@@ -236,25 +225,22 @@ function ApplicationForm() {
               required
             >
               <DatePicker
-                placeholder='Дата рождения'
+                format={dateFormatList}
+                placeholder='Date of Birth'
                 className={formStyles.formInput}
                 onChange={onApplicantBirthDateChange}
+                changeOnBlur={true}
               />
             </Form.Item>
 
             <Form.Item
               name='phoneNumber'
-              label='Номер телефона'
+              label='Phone number'
               rules={[
                 {
-                  message: 'Номер телефона должен состоять из 11 цифр',
+                  message: 'Enter the correct phone number',
                   validator: (_, value) => {
-                    console.log(value)
-                    console.log(applicantUnmaskedPhoneNumberRef)
-                    if (
-                      /^\d+$/.test(applicantUnmaskedPhoneNumberRef.current.unmaskedValue) &&
-                      applicantUnmaskedPhoneNumberRef.current.unmaskedValue.length === 11
-                    ) {
+                    if (value && /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/.test(value)) {
                       return Promise.resolve()
                     }
                     return Promise.reject()
@@ -263,47 +249,47 @@ function ApplicationForm() {
               ]}
               required
             >
-              <Input placeholder='Номер телефона' ref={applicantPhoneNumberInputRef} autoComplete='new-password' />
+              <Input placeholder='Phone number' type='number' />
             </Form.Item>
             <Form.Item
               name='email'
-              label='Электронная почта'
+              label='e-mail'
               rules={[
                 {
                   required: true,
-                  message: 'Адрес электронной почты должен быть корректен',
+                  message: 'Enter the correct e-mail',
                   type: 'email',
                 },
               ]}
               required
             >
-              <Input placeholder='Электронная почта' type='email' />
+              <Input placeholder='e-mail' type='email' />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               name='sex'
-              label='Пол'
+              label='Gender'
               rules={[
                 {
                   required: true,
-                  message: 'Пол не указан',
+                  message: 'Gender not specified',
                 },
               ]}
               required
             >
-              <Select placeholder='Пол'>
-                <Select.Option value='male'>Мужской</Select.Option>
-                <Select.Option value='female'>Женский</Select.Option>
+              <Select placeholder='Gender'>
+                <Select.Option value='male'>Male</Select.Option>
+                <Select.Option value='female'>Female</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item
               name='registrationCountry'
-              label='Страна регистрации'
+              label='Citizenship'
               rules={[
                 {
                   required: true,
-                  message: 'Страна регистрации не указана',
+                  message: 'Citizenship not specified',
                 },
               ]}
               required
@@ -312,16 +298,16 @@ function ApplicationForm() {
                 showSearch
                 options={countries.data}
                 loading={countries.status === STATUS_DICT.PENDING}
-                placeholder='Страна регистрации'
+                placeholder='Citizenship'
               />
             </Form.Item>
             <Form.Item
               name='livingCountry'
-              label='Страна проживания'
+              label='Residence country'
               rules={[
                 {
                   required: true,
-                  message: 'Страна проживания не указана',
+                  message: 'Residence country not specified',
                 },
               ]}
               required
@@ -330,39 +316,39 @@ function ApplicationForm() {
                 showSearch
                 options={countries.data}
                 loading={countries.status === STATUS_DICT.PENDING}
-                placeholder='Страна проживания'
+                placeholder='Residence country'
               />
             </Form.Item>
             <Form.Item
               name='residenceVisaAvalibility'
-              label='Виза на проживание в России'
+              label='Russian visa'
               rules={[
                 {
                   required: true,
-                  message: 'Наличие визы на проживание в России не указано',
+                  message: 'Presence of Russian visa not specified',
                 },
               ]}
               required
             >
-              <Select placeholder='Наличие визы не указано'>
-                <Select.Option value={true}>Есть виза на проживание</Select.Option>
-                <Select.Option value={false}>Нет визы на проживание</Select.Option>
+              <Select placeholder='Presence of Russian visa not specified'>
+                <Select.Option value={true}>I have a Russian visa</Select.Option>
+                <Select.Option value={false}>I don’t have a Russian visa</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item
               name='preferredDirectionOfStudy'
-              label='Профиль обучения'
+              label='Educational program'
               rules={[
                 {
                   required: true,
-                  message: 'Профиль обучения не указан',
+                  message: 'Educational program not specified',
                 },
               ]}
               required
             >
-              <Select placeholder='Профиль не выбран'>
-                <Select.Option value='medical'>Медицинский</Select.Option>
-                <Select.Option value='technical'>Инженерно-технический</Select.Option>
+              <Select placeholder='Educational program not specified'>
+                <Select.Option value='medical'>Medical</Select.Option>
+                <Select.Option value='technical'>Engineering technical</Select.Option>
               </Select>
             </Form.Item>
           </Col>
@@ -371,13 +357,13 @@ function ApplicationForm() {
           <Col span={12}>
             <Form.Item
               name='passportOriginal'
-              label='Оригинал паспорта'
+              label='Scan copy of passport '
               layout='horizontal'
               valuePropName='file'
               rules={[
                 {
                   required: true,
-                  message: 'Файл оригинала паспорта не загружен или имеет некорректный формат',
+                  message: 'The original passport file is not uploaded or is not in the correct format',
                 },
               ]}
               required
@@ -398,7 +384,7 @@ function ApplicationForm() {
                 }}
                 maxCount={1}
               >
-                <Button icon={<UploadOutlined />}>Загрузить</Button>
+                <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
           </Col>
@@ -407,14 +393,14 @@ function ApplicationForm() {
           <Col span={12}>
             <Form.Item
               name='russianPassport'
-              label='Заверенный перевод паспорта на русский язык'
+              label='Certified translation of the passport into Russian'
               layout='horizontal'
               valuePropName='file'
               rules={[
                 {
                   required: true,
                   message:
-                    'Файл заверенного перевода паспорта на русский язык не загружен или имеет некорректный формат',
+                    'The file of the certified translation of the passport into Russian is not loaded or has an incorrect format',
                 },
               ]}
               required
@@ -435,7 +421,7 @@ function ApplicationForm() {
                 accept='image/png, image/jpeg'
                 maxCount={1}
               >
-                <Button icon={<UploadOutlined />}>Загрузить</Button>
+                <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
           </Col>
@@ -444,13 +430,14 @@ function ApplicationForm() {
           <Col span={12}>
             <Form.Item
               name='educationDocumentOriginal'
-              label='Документ об образовании'
+              label='Scan copy of completed education certificate'
               layout='horizontal'
               valuePropName='file'
               rules={[
                 {
                   required: true,
-                  message: 'Файл документа об образовании не загружен или имеет некорректный формат',
+                  message:
+                    'Scan copy of completed education certificate is not uploaded or is not in the correct format',
                 },
               ]}
               required
@@ -471,7 +458,7 @@ function ApplicationForm() {
                 accept='image/png, image/jpeg'
                 maxCount={1}
               >
-                <Button icon={<UploadOutlined />}>Загрузить</Button>
+                <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
           </Col>
@@ -480,13 +467,14 @@ function ApplicationForm() {
           <Col span={12}>
             <Form.Item
               name='russianEducationDocument'
-              label='Документ об образовании на русском языке'
+              label='Scan copy of completed education certificate in Russian'
               layout='horizontal'
               valuePropName='file'
               rules={[
                 {
                   required: true,
-                  message: 'Файл документа об образовании на русском языке или имеет некорректный формат',
+                  message:
+                    'Scan copy of completed education certificate in Russian is not uploaded or is not in the correct format',
                 },
               ]}
               required
@@ -507,7 +495,7 @@ function ApplicationForm() {
                 accept='image/png, image/jpeg'
                 maxCount={1}
               >
-                <Button icon={<UploadOutlined />}>Загрузить</Button>
+                <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
           </Col>
@@ -519,7 +507,7 @@ function ApplicationForm() {
               valuePropName='checked'
               rules={[
                 {
-                  message: 'Необходимо дать согласие на обработку данных',
+                  message: 'Consent to data processing is required',
                   validator: (_, value) => {
                     if (value) {
                       return Promise.resolve()
@@ -531,14 +519,14 @@ function ApplicationForm() {
               style={{ marginBottom: 0 }}
               required
             >
-              <Checkbox>Даю согласие на обработку данных</Checkbox>
+              <Checkbox>I agree to the processing of my personal data</Checkbox>
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={100}>
           <Col span={12}>
             <Form.Item name='isRepresentative' valuePropName='checked' style={{ marginBottom: 0 }} onClick={onChecked}>
-              <Checkbox>Являюсь представителем заявителя</Checkbox>
+              <Checkbox>I am the representative of the applicant</Checkbox>
             </Form.Item>
           </Col>
         </Row>
@@ -547,10 +535,10 @@ function ApplicationForm() {
             <Col span={12}>
               <Form.Item
                 name='representativeSurname'
-                label='Фамилия представителя'
+                label='Representative surname'
                 rules={[
                   {
-                    message: 'Фамилия представителя должно быть строкой',
+                    message: 'Representative surname should be a string',
                     validator: (_, value) => {
                       if (
                         value &&
@@ -565,14 +553,14 @@ function ApplicationForm() {
                 ]}
                 required
               >
-                <Input placeholder='Фамилия представителя' className={formStyles.formInput} />
+                <Input placeholder='Representative surname' className={formStyles.formInput} />
               </Form.Item>
               <Form.Item
                 name='representativeName'
-                label='Имя представителя'
+                label='Representative name'
                 rules={[
                   {
-                    message: 'Имя представителя должно быть строкой',
+                    message: 'Representative name should be a string',
                     validator: (_, value) => {
                       if (
                         value &&
@@ -587,47 +575,22 @@ function ApplicationForm() {
                 ]}
                 required
               >
-                <Input placeholder='Имя представителя' className={formStyles.formInput} />
+                <Input placeholder='Representative name' className={formStyles.formInput} />
               </Form.Item>
 
-              <Form.Item
-                name='representativePatronymic'
-                label='Отчество представителя'
-                rules={[
-                  {
-                    message: 'Отчество представителя должно быть строкой',
-                    validator: (_, value) => {
-                      if (
-                        value &&
-                        (/^[a-zA-Z]+$/.test(value) ||
-                          /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/.test(value))
-                      ) {
-                        return Promise.resolve()
-                      }
-                      return Promise.reject()
-                    },
-                  },
-                ]}
-                required
-              >
-                <Input placeholder='Отчество представителя' className={formStyles.formInput} />
+              <Form.Item name='representativePatronymic' label='Representative patronymic (if available)'>
+                <Input placeholder='Representative patronymic' className={formStyles.formInput} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 name='representativePhoneNumber'
-                label='Номер телефона представителя'
+                label='The phone number of Representative'
                 rules={[
                   {
-                    message: 'Номер телефона представителя должен состоять из 11 цифр',
+                    message: 'Enter the correct phone number of Representative',
                     validator: (_, value) => {
-                      console.log(value)
-                      console.log(representativeUnmaskedPhoneNumberRef)
-                      // return Promise.resolve()
-                      if (
-                        /^\d+$/.test(representativeUnmaskedPhoneNumberRef.current.unmaskedValue) &&
-                        representativeUnmaskedPhoneNumberRef.current.unmaskedValue.length === 11
-                      ) {
+                      if (value && /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/.test(value)) {
                         return Promise.resolve()
                       }
                       return Promise.reject()
@@ -636,25 +599,21 @@ function ApplicationForm() {
                 ]}
                 required
               >
-                <Input
-                  placeholder='Номер телефона представителя'
-                  ref={representativePhoneNumberInputRef}
-                  autoComplete='new-password'
-                />
+                <Input placeholder='The phone number of Representative' type='number' />
               </Form.Item>
               <Form.Item
                 name='representativeEmail'
-                label='Электронная почта представителя'
+                label='The e-mail of Representative'
                 rules={[
                   {
-                    message: 'Адрес электронной почты представителя должен быть корректен',
+                    message: 'The e-mail of Representative must be correct',
                     type: 'email',
                     required: true,
                   },
                 ]}
                 required
               >
-                <Input placeholder='Электронная почта представителя' type='email' />
+                <Input placeholder='The e-mail of Representative' type='email' />
               </Form.Item>
             </Col>
           </Row>
@@ -668,7 +627,7 @@ function ApplicationForm() {
                 htmlType='submit'
                 loading={applicationFormResult.status === STATUS_DICT.PENDING}
               >
-                Подать заявление
+                Apply
               </Button>
             </Form.Item>
           </Col>

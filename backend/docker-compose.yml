@@ -12,19 +12,9 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     ports:
       - '5432:5432'
-    # networks:
-    #   - app-network
+    networks:
+      - app-network
     restart: unless-stopped
-
-  # redis:
-  #   image: redis:6.2-alpine
-  #   restart: always
-  #   ports:
-  #     - '6379:6379'
-  #   # networks:
-  #   #   - app-network
-  #   volumes:
-  #     - ./volumes/redis:/data/redis
 
   # app:
   #   build:
@@ -38,14 +28,13 @@ services:
   #   env_file: .env
   #   depends_on:
   #     - postgres
-  #     - redis
   #   ports:
-  #     - '3000:3000'
+  #     - '3001:3001'
   #   networks:
   #     - app-network
-# volumes:
-#   ignore:
+volumes:
+  ignore:
 
-# networks:
-#   app-network:
-#     driver: bridge
+networks:
+  app-network:
+    driver: bridge

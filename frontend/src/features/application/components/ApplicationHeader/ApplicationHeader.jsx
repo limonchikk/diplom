@@ -10,7 +10,7 @@ function Header() {
       </Col>
       <Col className={styles.headerTitle}>
         <h1>Medical University of Chemical Technology</h1>
-        <h2>Подготовительное отделение</h2>
+        <h2>Preparatory department</h2>
       </Col>
     </Row>
   )

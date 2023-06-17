@@ -1,5 +1,6 @@
 .adminPanelWrapper {
   padding: 70px 90px;
+  height: 100vh;
 }
 
 .adminPanelHeading h1 {
@@ -31,4 +32,5 @@
 
 .active {
   background-color: #cbd7f0;
+  border: 3px solid #0d66a7;
 }

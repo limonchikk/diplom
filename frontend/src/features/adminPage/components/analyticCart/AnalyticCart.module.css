@@ -1,0 +1,11 @@
+.formInput {
+  width: 100%;
+}
+
+.customTooltip {
+  padding: 10px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  text-transform: capitalize;
+}

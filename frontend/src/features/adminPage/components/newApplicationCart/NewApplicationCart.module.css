@@ -1,2 +1,27 @@
-.descriptionItem {
+.descriptionItem span {
+  justify-content: center;
+}
+
+.newApplicationTable table th {
+  border: 1px solid #000 !important;
+}
+
+.newApplicationTable table td {
+  border: 1px solid #000 !important;
+}
+
+.collapse {
+  background-color: #cbd7f0;
+  border: 1px solid #0d66a7;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  color: #000 !important;
+}
+
+.collapseHeader > div:last-child {
+  padding: 10px 35px;
+}
+
+.viewed span > span {
+  border: 1px solid black !important;
 }

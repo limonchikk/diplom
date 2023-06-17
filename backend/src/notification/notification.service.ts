@@ -2,7 +2,7 @@ import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { UserService } from '../user/user.service'
-import { CreateQuestionDto } from './dto/create-question.dto'
+import { CreateNotificationDto, NotificationType } from './dto/create-question.dto'
 
 @Injectable()
 export class NotificationService {
@@ -13,19 +13,26 @@ export class NotificationService {
   ) {}
 
   private sendEmail(data: ISendMailOptions) {
-    console.log(data)
     return this.mailerService.sendMail(data)
   }
 
-  async sendQuestion(dto: CreateQuestionDto) {
+  async sendQuestion(dto: CreateNotificationDto) {
     const toUser = await this.userService.getOne(this.configService.get('user.defaultLogin')!)
-    console.log(toUser)
-    console.log(dto)
+
+    let subject = ''
+
+    if (dto.type === NotificationType.question) {
+      subject = `Новый вопрос от абитуриента!`
+    } else if (dto.type === NotificationType.application) {
+      subject = `Новая заявка от абитуриента!`
+    } else {
+      subject = `Уведомление!`
+    }
 
     return this.sendEmail({
       template: 'new-application',
       context: dto,
-      subject: `Новый вопрос от абитуриента!`,
+      subject,
       to: toUser.email,
     })
   }

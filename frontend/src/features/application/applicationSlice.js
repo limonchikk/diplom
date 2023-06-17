@@ -5,15 +5,19 @@ import {
   fetchApplyApplicationForm,
   fetchCountries,
   fetchDocuments,
+  fetchStatistics,
   sendQuestion,
+  updateApplicationData,
 } from '../../api/application'
 
 const initialState = {
   countries: { status: STATUS_DICT.DEFAULT, data: [] },
-  applicationForm: { status: STATUS_DICT.DEFAULT, applicationId: null },
+  applicationForm: { status: STATUS_DICT.DEFAULT, data: null },
   applications: { status: STATUS_DICT.DEFAULT, data: null },
   documents: { status: STATUS_DICT.DEFAULT, data: null },
   question: { status: STATUS_DICT.DEFAULT, data: null },
+  statistics: { status: STATUS_DICT.DEFAULT, data: null },
+  application: { status: STATUS_DICT.DEFAULT, data: null },
 }
 
 export const getCountries = createAsyncThunk('getCountries', async () => fetchCountries())
@@ -21,6 +25,8 @@ export const applyApplicationForm = createAsyncThunk('applyForm', async data => 
 export const getApplications = createAsyncThunk('getApplications', async params => fetchApplications(params))
 export const getDocuments = createAsyncThunk('getDocument', async params => fetchDocuments(params))
 export const sendApplicantQuestion = createAsyncThunk('sendQuestion', async data => sendQuestion(data))
+export const getStatistics = createAsyncThunk('getStatistics', async data => fetchStatistics(data))
+export const updateApplication = createAsyncThunk('updateApplication', async data => updateApplicationData(data))
 
 const applicationSlice = createSlice({
   name: 'application',
@@ -56,9 +62,9 @@ const applicationSlice = createSlice({
       })
       .addCase(applyApplicationForm.fulfilled, (state, action) => {
         state.applicationForm.status = STATUS_DICT.FINISHED
-        state.applicationForm.applicationId = action.payload
+        state.applicationForm.data = action.payload
       })
-      .addCase(applyApplicationForm.rejected, state => {
+      .addCase(applyApplicationForm.rejected, (state, action) => {
         state.applicationForm.status = STATUS_DICT.FAILED
       })
       .addCase(getApplications.pending, state => {
@@ -90,6 +96,26 @@ const applicationSlice = createSlice({
       })
       .addCase(sendApplicantQuestion.rejected, state => {
         state.question.status = STATUS_DICT.FAILED
+      })
+      .addCase(getStatistics.pending, state => {
+        state.statistics.status = STATUS_DICT.PENDING
+      })
+      .addCase(getStatistics.fulfilled, (state, action) => {
+        state.statistics.status = STATUS_DICT.FINISHED
+        state.statistics.data = action.payload
+      })
+      .addCase(getStatistics.rejected, state => {
+        state.statistics.status = STATUS_DICT.FAILED
+      })
+      .addCase(updateApplication.pending, state => {
+        state.application.status = STATUS_DICT.PENDING
+      })
+      .addCase(updateApplication.fulfilled, (state, action) => {
+        state.application.status = STATUS_DICT.FINISHED
+        state.application.data = action.payload
+      })
+      .addCase(updateApplication.rejected, state => {
+        state.application.status = STATUS_DICT.FAILED
       })
   },
 })

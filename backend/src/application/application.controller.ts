@@ -8,6 +8,9 @@ import { CreateApplicationDto, ApplicationDocumentsDto } from './dto/create-appl
 import { CreateApplicationResponseDto } from './dto/create-application.response.dto'
 import { FindApplicationParamDto } from './dto/find-application-param.dto'
 import { FindApplicationResponseDto } from './dto/find-applications.response.dto'
+import { StatisticsParamDto } from './dto/statistics.dto'
+import { StatisticsResponseDto } from './dto/statistics.response.dto'
+import { UpdateApplicationDto } from './dto/update-application.dto'
 
 @ApiTags('Заявки на обучение для иностранных граждан')
 @Controller('applications')
@@ -42,5 +45,31 @@ export class ApplicationController {
   @Get()
   find(@Query() query: FindApplicationParamDto): Promise<FindApplicationResponseDto> {
     return this.applicationService.find(query)
+  }
+
+  @ApiOperation({
+    summary: 'Статистика',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'OK',
+  })
+  @Get('statistics')
+  @JwtAuthGuard()
+  statistics(@Query() query: StatisticsParamDto): Promise<StatisticsResponseDto> {
+    return this.applicationService.statistics(query)
+  }
+
+  @ApiOperation({
+    summary: 'Обновление',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'OK',
+  })
+  @Post('update')
+  @JwtAuthGuard()
+  update(@Body() dto: UpdateApplicationDto) {
+    return this.applicationService.update(dto)
   }
 }

@@ -1,18 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform, Type } from 'class-transformer'
-import {
-  IsBoolean,
-  IsDateString,
-  IsEmail,
-  IsEnum,
-  IsNumberString,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator'
+import { IsBoolean, IsDateString, IsEmail, IsEnum, IsNumberString, IsOptional, IsString, ValidateNested } from 'class-validator'
 import { ApplicantSex, PreferredDirectionOfStudy } from '../../models/application.entity'
 
 export class RepresentativeDto {
@@ -25,7 +13,7 @@ export class RepresentativeDto {
     if (value && !isNaN(+value)) return false
     return value
   })
-  @IsString({ message: 'Имя представителя должно быть строкой' })
+  @IsString({ message: 'Representative name should be a string' })
   name!: string
 
   @ApiProperty({
@@ -37,7 +25,7 @@ export class RepresentativeDto {
     if (value && !isNaN(+value)) return false
     return value
   })
-  @IsString({ message: 'Фамилия представителя должна быть строкой' })
+  @IsString({ message: 'Representative surname should be a string' })
   surname!: string
 
   @ApiProperty({
@@ -45,11 +33,8 @@ export class RepresentativeDto {
     type: String,
     required: true,
   })
-  @Transform(({ value }) => {
-    if (value && !isNaN(+value)) return false
-    return value
-  })
-  @IsString({ message: 'Отчество представителя должна быть строкой' })
+  @IsString({ message: 'Representative patronymic should be a string' })
+  @IsOptional()
   patronymic!: string
 
   @ApiProperty({
@@ -57,7 +42,7 @@ export class RepresentativeDto {
     type: String,
     required: true,
   })
-  @IsEmail({}, { message: 'Адрес электронной почты представителя должен быть корректным' })
+  @IsEmail({}, { message: 'The E-mail of Representative must be correct' })
   email!: string // +
 
   @ApiProperty({
@@ -65,9 +50,7 @@ export class RepresentativeDto {
     type: String,
     required: true,
   })
-  @IsNumberString({}, { message: 'Номер телефона представителя должен состоять только из цифр' })
-  @MinLength(11, { message: 'Номер телефона представителя должен состоять ровно из 11 символов' })
-  @MaxLength(11, { message: 'Номер телефона представителя должен состоять ровно из 11 символов' })
+  @IsNumberString({}, { message: 'The phone number of Representative must contain numbers only' })
   phoneNumber!: string // +
 }
 
@@ -127,7 +110,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     if (value && !isNaN(+value)) return false
     return value
   })
-  @IsString({ message: 'Имя абитуриента должно быть строкой' })
+  @IsString({ message: 'Name should be a string' })
   name!: string
 
   @ApiProperty({
@@ -139,7 +122,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     if (value && !isNaN(+value)) return false
     return value
   })
-  @IsString({ message: 'Фамилия абитуриента должна быть строкой' })
+  @IsString({ message: 'Surname should be a string' })
   surname!: string
 
   @ApiProperty({
@@ -147,11 +130,8 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     type: String,
     required: true,
   })
-  @Transform(({ value }) => {
-    if (value && !isNaN(+value)) return false
-    return value
-  })
-  @IsString({ message: 'Отчество абитуриента должна быть строкой' })
+  @IsString({ message: 'Patronymic should be a string' })
+  @IsOptional()
   patronymic!: string
 
   @ApiProperty({
@@ -159,7 +139,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     type: String,
     required: true,
   })
-  @IsEmail({}, { message: 'Адрес электронной почты абитуриента должен быть корректным' })
+  @IsEmail({}, { message: 'Enter the correct E-mail' })
   email!: string // +
 
   @ApiProperty({
@@ -167,9 +147,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     type: String,
     required: true,
   })
-  @IsNumberString({}, { message: 'Номер телефона абитуриента должен состоять только из цифр' })
-  @MinLength(11, { message: 'Номер телефона абитуриента должен состоять ровно из 11 символов' })
-  @MaxLength(11, { message: 'Номер телефона абитуриента должен состоять ровно из 11 символов' })
+  @IsNumberString({}, { message: 'Phone number should be valid' })
   phoneNumber!: string // +
 
   @ApiProperty({
@@ -178,7 +156,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     enum: ApplicantSex,
     required: true,
   })
-  @IsEnum(ApplicantSex, { message: 'Пол абитуриента должен быть корректным' })
+  @IsEnum(ApplicantSex, { message: 'Gender not specified' })
   sex!: ApplicantSex // +
 
   @ApiProperty({
@@ -190,7 +168,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     if (value && !isNaN(+value)) return false
     return value
   })
-  @IsString({ message: 'Страна регистрации абитуриента должна быть строкой' })
+  @IsString({ message: 'Citizenship should be string' })
   registrationCountry!: string // +
 
   @ApiProperty({
@@ -202,7 +180,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     if (value && !isNaN(+value)) return false
     return value
   })
-  @IsString({ message: 'Страна проживания абитуриента должна быть строкой' })
+  @IsString({ message: 'Residence country should be string' })
   livingCountry!: string // =
 
   @ApiProperty({
@@ -210,7 +188,14 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     type: String,
     required: true,
   })
-  @IsDateString({}, { message: 'Дата рождения абитуриента должна быть строкой и соответствовать ISO формату' })
+  @Transform(({ value }) => {
+    let tmp = value.split('.')
+
+    const momentApplicantBirthDate = `${tmp[2]}-${tmp[1]}-${tmp[0]}`
+    if (!momentApplicantBirthDate) return false
+    return momentApplicantBirthDate
+  })
+  @IsDateString({}, { message: 'Date of Birth should be valid' })
   birthDate!: Date // +
 
   @ApiProperty({
@@ -219,7 +204,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     required: true,
   })
   @Type(() => Boolean)
-  @IsBoolean({ message: 'Наличие визы на проживание у абитуриента должно иметь булевый тип' })
+  @IsBoolean({ message: 'Presence of Russian visa not specified' })
   residenceVisaAvalibility!: boolean // +
 
   @ApiProperty({
@@ -228,7 +213,7 @@ export class CreateApplicationDto extends ApplicationDocumentsDto {
     enum: PreferredDirectionOfStudy,
     required: true,
   })
-  @IsEnum(PreferredDirectionOfStudy, { message: 'Наиболее предпочтительное направление обучения для абитуриента должно быть корректным' })
+  @IsEnum(PreferredDirectionOfStudy, { message: 'Educational program not specified' })
   preferredDirectionOfStudy!: PreferredDirectionOfStudy // +
 
   @ApiProperty({

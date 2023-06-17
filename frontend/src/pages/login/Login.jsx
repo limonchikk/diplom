@@ -14,7 +14,6 @@ const Login = () => {
   const { token, status } = useSelector(state => state.default.auth)
 
   const onFinish = values => {
-    console.log(values)
     dispatch(applyLogin(values))
   }
 

@@ -12,6 +12,10 @@ import { Document } from '../models'
 import { ApplicantDocumentType } from '../models/document.entity'
 import { FindApplicationParamDto } from './dto/find-application-param.dto'
 import { FindApplicationResponseDto } from './dto/find-applications.response.dto'
+import { StatisticsParamDto } from './dto/statistics.dto'
+import { StatisticsResponseDto } from './dto/statistics.response.dto'
+import { UpdateApplicationDto } from './dto/update-application.dto'
+import moment from 'moment'
 
 @Injectable()
 export class ApplicationService implements OnModuleInit {
@@ -28,7 +32,7 @@ export class ApplicationService implements OnModuleInit {
 
   async save(dto: CreateApplicationDto, files: Express.Multer.File[]) {
     const application = new Application()
-    application.applicantFio = [dto.name, dto.surname, dto.patronymic].join(' ')
+    application.applicantFio = [dto.surname, dto.name, dto.patronymic].join(' ')
     application.applicantEmail = dto.email
     application.applicantPhoneNumber = dto.phoneNumber
     application.applicantSex = dto.sex
@@ -38,6 +42,11 @@ export class ApplicationService implements OnModuleInit {
     application.applicantResidenceVisaAvalibility = dto.residenceVisaAvalibility
     application.applicantPreferredDirectionOfStudy = dto.preferredDirectionOfStudy
     application.representative = dto.representative
+
+    const currentDate = moment().toDate()
+    application.createdAt = currentDate
+    application.updatedAt = currentDate
+
     application.documents = []
 
     try {
@@ -56,6 +65,8 @@ export class ApplicationService implements OnModuleInit {
       )
 
       const data = await this.applicationRepository.save(application)
+      await this.applicationRepository.save(application)
+
       return new CreateApplicationResponseDto({ id: data.applicationId })
     } catch (err) {
       console.log(err)
@@ -92,6 +103,43 @@ export class ApplicationService implements OnModuleInit {
       },
       relations: { documents: true },
     })
+
     return new FindApplicationResponseDto({ applications, count })
+  }
+
+  //TODO:
+  async statistics(params: StatisticsParamDto) {
+    if (params.groupBy === 'applicant_preferred_direction_of_study' || params.groupBy === 'applicant_registration_country') {
+      const res = await this.applicationRepository.query(
+        `SELECT ${params.groupBy} as key, count(*) FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY ${params.groupBy}`,
+        [params.from, params.to],
+      )
+      return new StatisticsResponseDto({ bars: res })
+    }
+
+    if (params.groupBy === 'month') {
+      const res = await this.applicationRepository.query(
+        `SELECT DATE_TRUNC('month', created_at) as key, count(*) as count FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY key`,
+        [params.from, params.to],
+      )
+      return new StatisticsResponseDto({ bars: res })
+    }
+
+    const res = await this.applicationRepository.query(
+      `SELECT DATE_TRUNC('year', created_at) as key, count(*) as count FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY key`,
+      [params.from, params.to],
+    )
+    return new StatisticsResponseDto({ bars: res })
+  }
+
+  async update(dto: UpdateApplicationDto) {
+    const application = await this.getOne(dto.id)
+
+    const currentDate = moment().toDate()
+    application.updatedAt = currentDate
+
+    await this.applicationRepository.update({ applicationId: application.applicationId }, { viewed: dto.viewed })
+
+    return { ...application, viewed: dto.viewed }
   }
 }

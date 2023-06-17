@@ -1,16 +1,20 @@
-import { CreateDateColumn, Entity, UpdateDateColumn } from 'typeorm'
+import { Column, Entity } from 'typeorm'
 
 @Entity()
 export class Auditable {
-  @CreateDateColumn({
+  @Column({
     comment: 'Created at date',
     name: 'created_at',
+    type: 'timestamptz',
+    nullable: true,
   })
   createdAt: Date
 
-  @UpdateDateColumn({
+  @Column({
     comment: 'Updated at date',
     name: 'updated_at',
+    type: 'timestamptz',
+    nullable: true,
   })
   updatedAt: Date
 }

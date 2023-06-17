@@ -2,3 +2,53 @@
   font-size: 12px;
   font-weight: 400 !important;
 }
+
+.allApplicationTable table tr td:first-child {
+  text-align: start !important;
+}
+
+.allApplicationTable table tr td {
+  border-left: 1px solid #367ead !important;
+  border-bottom: 1px solid #367ead !important;
+}
+
+.allApplicationTable table tr td:last-child {
+  border-right: 1px solid #367ead;
+}
+
+.allApplicationTable table tr:nth-child(even) {
+  background: #cbd7f0;
+}
+
+.allApplicationTable table tr:nth-child(even):hover > td {
+  background: #cbd7f0 !important;
+}
+
+.allApplicationTable table tr:nth-child(even) td:last-child {
+  background: #cbd7f0;
+}
+
+.allApplicationTable table thead tr th {
+  border-left: 1px solid #367ead !important;
+  border-radius: 0 !important;
+}
+
+.allApplicationTable table thead tr th:last-child {
+  border-right: 1px solid #367ead !important;
+}
+
+.cascader {
+  text-align: center;
+}
+
+.cascader:hover {
+  outline: none;
+}
+
+.rep span > span {
+  border: 1px solid black !important;
+}
+
+.active {
+  display: block !important;
+}

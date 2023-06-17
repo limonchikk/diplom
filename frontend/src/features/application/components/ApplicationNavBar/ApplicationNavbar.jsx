@@ -19,12 +19,12 @@ function Navbar({ showForm }) {
     <Row>
       <Col span={12} className={`${styles.navbarElement} ${active.questions ? styles.active : null}`}>
         <AHrefJavascript className={styles.navbarLink} onClick={onApplicationQuestionSelect}>
-          Остались вопросы? Мы ответим!
+          Still have questions? We’ll answer
         </AHrefJavascript>
       </Col>
       <Col span={12} className={`${styles.navbarElement} ${active.form ? styles.active : null}`}>
         <AHrefJavascript className={styles.navbarLink} onClick={onApplicationFormSelect}>
-          Оставить заявку на обучение
+          Apply for training
         </AHrefJavascript>
       </Col>
     </Row>

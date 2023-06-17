@@ -24,8 +24,6 @@ export class UserController {
   @JwtAuthGuard()
   @Put()
   update(@Body() dto: UpdateUserDto, @ExtractUser() user: JwtToken) {
-    console.log('update')
-    console.log(dto)
     return this.userService.update(user.id, dto)
   }
 
@@ -40,10 +38,7 @@ export class UserController {
   @JwtAuthGuard()
   @Get('me')
   async me(@ExtractUser() user: JwtToken) {
-    console.log(44)
-    console.log(user)
     const { email } = await this.userService.getOne({ id: user.id })
-    console.log(email)
     return new GetMeResponseDto({ email })
   }
 }

@@ -1,57 +1,52 @@
 .heading {
-  margin-bottom: 50px;
+  margin-bottom: 35px;
 }
 
 .heading h2 {
   font-size: 30px;
-  /* padding-bottom: 25px;
-  padding-top: 10px; */
   padding-bottom: 20px;
   font-family: 'Roboto', sans-serif;
 }
 
 .applicationQuestion p {
+  font-size: 14px;
+  line-height: 30px;
+  font-weight: 300;
   color: #828282;
 }
 
-.heading ul {
-  list-style-type: decimal;
-  padding-top: 35px;
-  padding-left: 20px;
+.applicationQuestion li {
+  font-size: 14px;
+  line-height: 30px;
+  font-weight: 300;
 }
 
-.heading li {
-  font-size: 17px;
-  /* padding-bottom: 25px;
-  padding-top: 10px; */
-  padding-bottom: 25px;
-  font-family: 'Inter', sans-serif;
-  /* font-family: 'Roboto', sans-serif; */
+.questionList li:last-child {
+  padding-bottom: 0;
+}
+
+.heading .mainList {
+  list-style-type: decimal;
+}
+
+.mainListItem {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.questionList {
+  list-style-type: disc;
+  color: #828282;
+  padding-left: 25px;
 }
 
 .applicantQuestionFormBlock p {
-  font-weight: 400;
-  font-size: 17px;
   line-height: 30px;
 }
 .applicantQuestionForm label {
   color: #828282;
 }
 
-.submitFormBtn {
-  margin-top: 15px;
-}
-
-.applicantQuestionFormBlock form {
-  padding-top: 25px;
-}
-
 .heading li b {
   font-weight: 500;
-}
-.heading li p {
-  font-weight: 300;
-  font-size: 17px;
-  margin-top: 12px;
-  line-height: 30px;
 }
