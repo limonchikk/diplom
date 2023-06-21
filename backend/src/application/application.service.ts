@@ -109,7 +109,15 @@ export class ApplicationService implements OnModuleInit {
 
   //TODO:
   async statistics(params: StatisticsParamDto) {
-    if (params.groupBy === 'applicant_preferred_direction_of_study' || params.groupBy === 'applicant_registration_country') {
+    if (params.groupBy === 'applicant_preferred_direction_of_study') {
+      const res = await this.applicationRepository.query(
+        `SELECT applicant_preferred_direction_of_study as key, count(*) FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY ${params.groupBy}`,
+        [params.from, params.to],
+      )
+      return new StatisticsResponseDto({ bars: res })
+    }
+
+    if (params.groupBy === 'applicant_registration_country') {
       const res = await this.applicationRepository.query(
         `SELECT ${params.groupBy} as key, count(*) FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY ${params.groupBy}`,
         [params.from, params.to],
@@ -125,11 +133,15 @@ export class ApplicationService implements OnModuleInit {
       return new StatisticsResponseDto({ bars: res })
     }
 
-    const res = await this.applicationRepository.query(
-      `SELECT DATE_TRUNC('year', created_at) as key, count(*) as count FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY key`,
-      [params.from, params.to],
-    )
-    return new StatisticsResponseDto({ bars: res })
+    if (params.groupBy === 'year') {
+      const res = await this.applicationRepository.query(
+        `SELECT DATE_TRUNC('year', created_at) as key, count(*) as count FROM applications WHERE created_at >= $1::date AND created_at <= $2::date GROUP BY key`,
+        [params.from, params.to],
+      )
+      return new StatisticsResponseDto({ bars: res })
+    }
+
+    return new StatisticsResponseDto({ bars: [] })
   }
 
   async update(dto: UpdateApplicationDto) {

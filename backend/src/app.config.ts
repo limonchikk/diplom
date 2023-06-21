@@ -3,7 +3,6 @@ export default (): Record<string, any> => ({
     httpPort: process.env.APP_PORT,
     httpPrefix: process.env.HTTP_PREFIX,
     httpHost: process.env.HTTP_HOST,
-    httpVersion: process.env.HTTP_VERSION,
     serviceName: process.env.SERVICE_NAME,
   },
   database: {
